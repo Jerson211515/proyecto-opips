@@ -48,3 +48,26 @@ body { margin: 0; padding: 20px; background: #dfe8e4; font-family: 'Segoe UI', A
 .exd-savebar { position: sticky; bottom: 12px; margin-top: 16px; background: #fffbea; border: 1.5px solid #e0a626; border-radius: 10px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 
 .exd-lock-note { font-size: 12px; color: #9ca3af; display: flex; align-items: center; gap: 5px; margin: 0 0 10px; }
+
+/* ============ RESPONSIVE (móvil) ============ */
+@media (max-width: 720px) {
+  body { padding: 0; }
+  .exd { border-radius: 0; border: none; max-width: 100%; }
+  .exd-header { padding: 10px 12px; gap: 8px; flex-wrap: wrap; }
+  .exd-h-title { font-size: 9.5px; }
+  .exd-h-sub { font-size: 12.5px; }
+  .exd-logo { width: 30px; height: 30px; font-size: 15px; }
+  .exd-avatar { width: 26px; height: 26px; font-size: 10px; }
+  .exd-save-indicator { display: none; }
+  .exd-edit-btn { padding: 6px 10px; font-size: 11px; margin-left: auto; }
+
+  .exd-body { flex-direction: column; }
+  .exd-sidebar { width: 100%; box-sizing: border-box; border-right: none; border-bottom: 1px solid #e5e9e7; padding: 10px 12px; }
+  .exd-main { padding: 12px; }
+
+  .exd-card { padding: 0.85rem 1rem; }
+  .exd-searchrow { flex-direction: column; }
+  .exd-tabsrow-wrap { flex-direction: column; align-items: stretch !important; gap: 10px; }
+  .exd-tabsrow { overflow-x: auto; gap: 14px !important; padding-bottom: 4px; }
+  .exd-tab { flex-shrink: 0; }
+}
