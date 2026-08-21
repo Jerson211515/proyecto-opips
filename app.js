@@ -45,7 +45,7 @@ function escapeHtml(s){ if (s===undefined||s===null) return ''; return String(s)
 let STATE = {
   projects: [], view: 'home', currentCui: null, activeTab: 'resumen',
   search: '', filterEtapa: '', loaded: false,
-  editMode: false, dirty: false, saving: false, saveMsg: ''
+  editMode: false, dirty: false, saving: false, saveMsg: '', showNewForm: false
 };
 
 // ============ CARGA DE DATOS (lectura pública, sin token) ============
@@ -251,7 +251,13 @@ function renderHome(){
       <div class="exd-card"><p class="exd-label">En ejecución física</p><p style="font-size:22px;font-weight:700;margin:0;color:#0f9d58">${enEjecucion}</p></div>
       <div class="exd-card"><p class="exd-label">En convocatoria</p><p style="font-size:22px;font-weight:700;margin:0;color:#1d4ed8">${enConvocatoria}</p></div>
     </div>
-    <div style="display:flex;gap:10px;margin-bottom:1rem">
+    ${STATE.editMode ? `
+    <div style="margin-bottom:1rem">
+      <button id="exd-new-project-toggle" class="exd-btn-outline"><i class="ti ti-plus"></i> Nuevo proyecto</button>
+    </div>
+    ${STATE.showNewForm ? renderNewProjectForm() : ''}
+    ` : ''}
+    <div class="exd-searchrow" style="display:flex;gap:10px;margin-bottom:1rem">
       <input id="exd-search" class="exd-input" placeholder="Buscar por nombre o CUI" value="${escapeHtml(STATE.search)}" style="flex:2;background:#fff">
       <select id="exd-filter-etapa" class="exd-select" style="flex:1;background:#fff"><option value="">Todas las etapas</option>${etapaOptions}</select>
     </div>
@@ -260,7 +266,67 @@ function renderHome(){
     </div>
   `;
 }
+function renderNewProjectForm(){
+  const etapaOptions=ETAPAS.map(e=>`<option value="${escapeHtml(e)}">${escapeHtml(e)}</option>`).join('');
+  return `
+    <div class="exd-card" style="margin-bottom:1rem">
+      <h3 style="margin:0 0 12px;font-size:15px">Nuevo proyecto</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:10px">
+        <div><p class="exd-label">CUI *</p><input id="exd-np-cui" class="exd-input" type="number" placeholder="Ej. 2500123"></div>
+        <div><p class="exd-label">Monto (S/)</p><input id="exd-np-monto" class="exd-input" type="number" placeholder="0"></div>
+        <div><p class="exd-label">Provincia</p><input id="exd-np-provincia" class="exd-input" placeholder="Provincia"></div>
+        <div><p class="exd-label">Distrito</p><input id="exd-np-distrito" class="exd-input" placeholder="Distrito"></div>
+        <div><p class="exd-label">Financista</p><input id="exd-np-financista" class="exd-input" placeholder="Financista"></div>
+        <div><p class="exd-label">Responsable</p><input id="exd-np-responsable" class="exd-input" placeholder="Responsable OPIPS"></div>
+        <div><p class="exd-label">Función</p><input id="exd-np-funcion" class="exd-input" placeholder="Ej. Transporte, Educación..."></div>
+        <div><p class="exd-label">Etapa inicial</p><select id="exd-np-etapa" class="exd-select">${etapaOptions}</select></div>
+      </div>
+      <p class="exd-label">Nombre completo del proyecto *</p>
+      <textarea id="exd-np-nombre" class="exd-textarea" placeholder="Nombre de la inversión" style="margin-bottom:12px"></textarea>
+      <div style="display:flex;gap:10px">
+        <button id="exd-np-save" class="exd-btn">Crear proyecto</button>
+        <button id="exd-np-cancel" class="exd-btn-outline">Cancelar</button>
+      </div>
+    </div>
+  `;
+}
+
 function wireHome(){
+  const npToggle=document.getElementById('exd-new-project-toggle');
+  if(npToggle) npToggle.addEventListener('click', ()=>{ STATE.showNewForm=!STATE.showNewForm; render(); });
+  const npCancel=document.getElementById('exd-np-cancel');
+  if(npCancel) npCancel.addEventListener('click', ()=>{ STATE.showNewForm=false; render(); });
+  const npSave=document.getElementById('exd-np-save');
+  if(npSave) npSave.addEventListener('click', ()=>{
+    const cui=Number(document.getElementById('exd-np-cui').value);
+    const nombre=document.getElementById('exd-np-nombre').value.trim();
+    if(!cui){ alert('Ingresa un CUI válido.'); return; }
+    if(getProject(cui)){ alert('Ya existe un proyecto con ese CUI.'); return; }
+    if(!nombre){ alert('Ingresa el nombre del proyecto.'); return; }
+    const provincia=document.getElementById('exd-np-provincia').value.trim();
+    const distrito=document.getElementById('exd-np-distrito').value.trim();
+    const nuevo = {
+      cui,
+      info: {
+        nombre,
+        ubicacion: [distrito, provincia].filter(Boolean).join(', ') || 'Sin ubicación registrada',
+        provincia: provincia || 'Sin registrar',
+        distrito: distrito || 'Sin registrar',
+        monto: Number(document.getElementById('exd-np-monto').value) || 0,
+        financista: document.getElementById('exd-np-financista').value.trim() || 'Sin financista registrado',
+        responsable: document.getElementById('exd-np-responsable').value.trim() || 'Sin asignar',
+        funcion: document.getElementById('exd-np-funcion').value.trim() || 'Sin función registrada',
+        unidadFormuladora: 'Sin registrar', unidadEjecutora: 'Sin registrar', fechaRegistro: todayISO()
+      },
+      situacion: { estado: 'Sin dato', etapa: document.getElementById('exd-np-etapa').value, ultimaActualizacion: todayISO(), avanceFisico: 0, avanceFinanciero: 0 },
+      seguimientoLog: [], proximasAcciones: [], etapaFechas: {}, documentos: []
+    };
+    STATE.projects.push(nuevo);
+    STATE.showNewForm=false;
+    markDirty();
+    STATE.currentCui=cui; STATE.view='detail'; STATE.activeTab='resumen';
+    render();
+  });
   document.getElementById('exd-search').addEventListener('input', e=>{
     const pos=e.target.selectionStart; STATE.search=e.target.value; render();
     const el=document.getElementById('exd-search'); el.focus(); el.setSelectionRange(pos,pos);
@@ -449,8 +515,8 @@ function renderDetail(cui){
         <p style="font-size:13px;margin:0;font-weight:600">${escapeHtml(p.info.financista)}</p>
       </div>
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e9e7;margin-bottom:1rem">
-      <div style="display:flex;gap:22px">${tabsHtml}</div>
+    <div class="exd-tabsrow-wrap" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e9e7;margin-bottom:1rem">
+      <div class="exd-tabsrow" style="display:flex;gap:22px">${tabsHtml}</div>
       <button id="exd-go-docs" class="exd-btn-outline" style="margin-bottom:8px"><i class="ti ti-folder"></i> Documentos</button>
     </div>
     ${body}
