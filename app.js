@@ -16,25 +16,32 @@ const ETAPAS = [
   "0. En trámite de priorización","1. Inversión priorizada con acuerdo de consejo","2. Solicitud de informe Previo a CGR",
   "3. Informe Previo emitido","4. Aprobación de bases","5. Convocatoria","6. Buena Pro","7. Elaboración de ET","8. Ejecución Física"
 ];
+
+// Alineación con el Reglamento de la Ley N° 29230 (D.S. N° 038-2026-EF)
+const ETAPA_META = [
+  { fase:'Priorización', articulo:'Art. 57.6.3', plazo:'Aprobación de la lista de priorización: hasta 30 días hábiles desde la comunicación de la OPMI.' },
+  { fase:'Priorización', articulo:'Art. 57.6.1', plazo:'Se formaliza mediante acuerdo del Consejo Regional o Concejo Municipal (facultad indelegable).' },
+  { fase:'Actos Previos', articulo:'Art. 80', plazo:'CGR emite el Informe Previo en 10 días hábiles (1 proyecto) / 15 días hábiles (2+). IOARR: 7 / 10 días hábiles.' },
+  { fase:'Actos Previos', articulo:'Art. 80.6', plazo:'Si la CGR no notifica dentro del plazo, se considera pronunciamiento sin recomendaciones.' },
+  { fase:'Actos Previos', articulo:'Art. 75 y 81', plazo:'Elaboración de bases: 10 días hábiles (proyectos) / 5 días (IOARR). Aprobación: hasta 5 días tras el informe de implementación de recomendaciones.' },
+  { fase:'Proceso de Selección', articulo:'Art. 97 y 106', plazo:'Se publica en diario de circulación nacional (proyectos > 120 UIT) o en el portal institucional (el resto de intervenciones).' },
+  { fase:'Proceso de Selección', articulo:'Art. 105 y 110', plazo:'Consentimiento de la buena pro: 8 días hábiles sin apelación (proyectos) / 5 días hábiles (otras intervenciones).' },
+  { fase:'Ejecución', articulo:'Art. 130.3', plazo:'Aprobación del Expediente Técnico: 30 días hábiles (proyectos) / 10 días hábiles (IOARR).' },
+  { fase:'Ejecución', articulo:'Art. 139.1', plazo:'Las valorizaciones se presentan dentro de los primeros 3 días del mes siguiente a cada avance.' }
+];
+
 function etapaIndex(e){ const i = ETAPAS.findIndex(x=>x===e); return i===-1?0:i; }
 function etapaShort(e){ return e.replace(/^\d+\.\s*/,''); }
+function etapaMeta(e){ return ETAPA_META[etapaIndex(e)]; }
 function etapaColor(e){
   const i = etapaIndex(e);
   if (i<=1) return {bg:'#fdeceb',text:'#c0392b'};
   if (i<=4) return {bg:'#fdf3e2',text:'#b8860b'};
-  if (i<=7) return {bg:'#e7f0fd',text:'#1d4ed8'};
+  if (i<=6) return {bg:'#e7f0fd',text:'#1d4ed8'};
   return {bg:'#e6f6ee',text:'#0f9d58'};
 }
-function groupLabel(e){
-  const i = etapaIndex(e);
-  if (i<=1) return 'Priorización';
-  if (i<=4) return 'Aprobación';
-  if (i===5) return 'Convocatoria';
-  if (i===6) return 'Buena Pro';
-  if (i===7) return 'Elaboración ET';
-  return 'Ejecución';
-}
-const GROUP_COLORS = {'Priorización':'#e24b4a','Aprobación':'#e0a626','Convocatoria':'#7f77dd','Buena Pro':'#378add','Elaboración ET':'#d85a30','Ejecución':'#1d9e75'};
+function groupLabel(e){ return etapaMeta(e).fase; }
+const GROUP_COLORS = {'Priorización':'#e24b4a','Actos Previos':'#e0a626','Proceso de Selección':'#378add','Ejecución':'#1d9e75'};
 
 function fmtMoney(n){ if (!n) return 'S/ 0'; return 'S/ ' + Number(n).toLocaleString('es-PE',{maximumFractionDigits:0}); }
 function todayISO(){ return new Date().toISOString().slice(0,10); }
@@ -190,7 +197,7 @@ function renderSidebar(){
     `<div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#4b5563;padding:1px 0"><span style="width:8px;height:8px;border-radius:50%;background:${GROUP_COLORS[g]};flex-shrink:0"></span>${g} (${groups[g]})</div>`
   ).join('');
   return `
-    <div class="exd-nav ${STATE.view==='home'&&!STATE.filterEtapa?'active':''}" data-nav="dashboard"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+    <div class="exd-nav ${STATE.view==='home'&&!STATE.filterEtapa&&!STATE.filterRiesgo?'active':''}" data-nav="dashboard"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
     <div class="exd-nav" data-nav="cartera"><i class="ti ti-folders"></i>Cartera de proyectos</div>
     <p style="font-size:10.5px;color:#9ca3af;font-weight:700;letter-spacing:.04em;margin:16px 4px 4px">ACCESOS RÁPIDOS</p>
     <div class="exd-quick" data-nav="ejecucion"><i class="ti ti-player-play" style="color:#0f9d58"></i>Proyectos en ejecución</div>
@@ -212,10 +219,10 @@ function renderSidebar(){
 function wireSidebar(){
   const d=document.querySelector('[data-nav="dashboard"]'), c=document.querySelector('[data-nav="cartera"]');
   const ej=document.querySelector('[data-nav="ejecucion"]'), rg=document.querySelector('[data-nav="riesgo"]');
-  if(d) d.addEventListener('click',()=>{STATE.view='home';STATE.filterEtapa='';render();});
-  if(c) c.addEventListener('click',()=>{STATE.view='home';render();});
-  if(ej) ej.addEventListener('click',()=>{STATE.view='home';STATE.filterEtapa='8. Ejecución Física';render();});
-  if(rg) rg.addEventListener('click',()=>{STATE.view='home';STATE.filterEtapa='0. En trámite de priorización';render();});
+  if(d) d.addEventListener('click',()=>{STATE.view='home';STATE.filterEtapa='';STATE.filterRiesgo=false;render();});
+  if(c) c.addEventListener('click',()=>{STATE.view='home';STATE.filterRiesgo=false;render();});
+  if(ej) ej.addEventListener('click',()=>{STATE.view='home';STATE.filterEtapa='8. Ejecución Física';STATE.filterRiesgo=false;render();});
+  if(rg) rg.addEventListener('click',()=>{STATE.view='home';STATE.filterEtapa='';STATE.filterRiesgo=true;render();});
 }
 
 // ============ HOME ============
@@ -227,7 +234,8 @@ function renderHome(){
   let filtered=STATE.projects.filter(p=>{
     const ms=!STATE.search||(p.info.nombre+p.cui).toLowerCase().includes(STATE.search.toLowerCase());
     const me=!STATE.filterEtapa||p.situacion.etapa===STATE.filterEtapa;
-    return ms&&me;
+    const mr=!STATE.filterRiesgo||etapaIndex(p.situacion.etapa)<=1;
+    return ms&&me&&mr;
   });
   const cards=filtered.map(p=>{
     const col=etapaColor(p.situacion.etapa);
@@ -351,23 +359,32 @@ function renderTimeline(p){
   const fechas=p.etapaFechas||{};
   const steps=ETAPAS.map((e,i)=>{
     const label=etapaShort(e);
+    const meta=ETAPA_META[i];
+    const isFirstOfPhase = i===0 || ETAPA_META[i-1].fase !== meta.fase;
+    const phaseColor = GROUP_COLORS[meta.fase];
     let icon,bg,border,iconColor;
     if(i<idx){icon='ti-check';bg='#0f9d58';border='#0f9d58';iconColor='#fff';}
     else if(i===idx){icon='ti-point-filled';bg='#fff';border='#1d4ed8';iconColor='#1d4ed8';}
     else{icon='ti-clock';bg='#f3f4f6';border='#d1d5db';iconColor='#9ca3af';}
     const fecha = fechas[i] ? fmtDate(fechas[i]) : (i<=idx ? '' : 'Pendiente');
     return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:78px;position:relative">
-      ${i<ETAPAS.length-1?`<div style="position:absolute;top:15px;left:50%;width:100%;height:2.5px;background:${i<idx?'#0f9d58':'#e5e7eb'};z-index:0"></div>`:''}
+      <p style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin:0 0 3px;color:${phaseColor};white-space:nowrap;height:11px">${isFirstOfPhase?escapeHtml(meta.fase):''}</p>
+      ${i<ETAPAS.length-1?`<div style="position:absolute;top:26px;left:50%;width:100%;height:2.5px;background:${i<idx?'#0f9d58':'#e5e7eb'};z-index:0"></div>`:''}
       <div style="width:30px;height:30px;border-radius:50%;background:${bg};border:2.5px solid ${border};display:flex;align-items:center;justify-content:center;z-index:1"><i class="ti ${icon}" style="font-size:15px;color:${iconColor}"></i></div>
       <p style="font-size:10.5px;text-align:center;margin:6px 0 0;color:${i===idx?'#1f2937':'#9ca3af'};font-weight:${i===idx?'700':'500'};max-width:78px;line-height:1.3">${escapeHtml(label)}</p>
       <p style="font-size:10px;text-align:center;margin:2px 0 0;color:#9ca3af">${escapeHtml(fecha)}</p>
     </div>`;
   }).join('');
+  const curMeta = ETAPA_META[idx];
   return `<div style="display:flex;align-items:flex-start;overflow-x:auto;padding:0.5rem 0.25rem 0.75rem">${steps}</div>
     <div style="display:flex;gap:18px;font-size:12px;color:#6b7280;padding-top:8px;border-top:1px solid #f0f0f0">
       <span><i class="ti ti-circle-filled" style="font-size:10px;color:#0f9d58"></i> Completado</span>
       <span><i class="ti ti-circle-filled" style="font-size:10px;color:#1d4ed8"></i> En curso</span>
       <span><i class="ti ti-circle-filled" style="font-size:10px;color:#d1d5db"></i> Pendiente</span>
+    </div>
+    <div style="margin-top:8px;padding:8px 10px;background:#f7faf9;border-radius:8px;font-size:12px;color:#4b5563;line-height:1.5">
+      <b style="color:#0f3d2e">${escapeHtml(curMeta.fase)} · ${escapeHtml(curMeta.articulo)}</b> — ${escapeHtml(curMeta.plazo)}
+      <span style="display:block;font-size:10.5px;color:#9ca3af;margin-top:2px">Reglamento de la Ley N° 29230, D.S. N° 038-2026-EF</span>
     </div>`;
 }
 
@@ -391,7 +408,10 @@ function renderDetail(cui){
           <p class="exd-label">Etapa actual</p>
           <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
             <div style="width:34px;height:34px;border-radius:50%;background:#e7f0fd;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-flag" style="font-size:16px;color:#1d4ed8"></i></div>
-            <p style="font-size:13.5px;font-weight:700;margin:0;line-height:1.3">${escapeHtml(etapaShort(p.situacion.etapa))}</p>
+            <div>
+              <p style="font-size:13.5px;font-weight:700;margin:0;line-height:1.3">${escapeHtml(etapaShort(p.situacion.etapa))}</p>
+              <p style="font-size:10.5px;color:#9ca3af;margin:2px 0 0">${escapeHtml(ETAPA_META[etapaIndex(p.situacion.etapa)].fase)} · ${escapeHtml(ETAPA_META[etapaIndex(p.situacion.etapa)].articulo)}</p>
+            </div>
           </div>
         </div>
         <div class="exd-card">
@@ -433,7 +453,7 @@ function renderDetail(cui){
     </div>`).join('') || '<p style="font-size:13px;color:#6b7280">Sin registros de seguimiento aún.</p>';
     body=`
       <div class="exd-card" style="margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
-        <div><p class="exd-label">Etapa</p><select id="exd-etapa-select" class="exd-select" ${ro?'disabled':''}>${ETAPAS.map(e=>`<option value="${escapeHtml(e)}" ${p.situacion.etapa===e?'selected':''}>${escapeHtml(e)}</option>`).join('')}</select></div>
+        <div><p class="exd-label">Etapa</p><select id="exd-etapa-select" class="exd-select" ${ro?'disabled':''}>${ETAPAS.map((e,ei)=>`<option value="${escapeHtml(e)}" ${p.situacion.etapa===e?'selected':''}>${escapeHtml(e)} — ${escapeHtml(ETAPA_META[ei].fase)}</option>`).join('')}</select></div>
         <div><p class="exd-label">Avance físico (%)</p><input id="exd-avance-fisico" class="exd-input" type="number" min="0" max="100" value="${p.situacion.avanceFisico}" ${ro?'disabled':''}></div>
         <div><p class="exd-label">Avance financiero (%)</p><input id="exd-avance-financiero" class="exd-input" type="number" min="0" max="100" value="${p.situacion.avanceFinanciero}" ${ro?'disabled':''}></div>
       </div>
