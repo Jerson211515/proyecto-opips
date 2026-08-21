@@ -1,0 +1,1099 @@
+[
+  {
+    "cui": 2700931,
+    "info": {
+      "nombre": "MEJORAMIENTO Y AMPLIACION DE LOS SERVICIOS DE INFORMACIÓN EN LA OFICINA DE TECNOLOGÍAS DE INFORMACIÓN DEL GOBIERNO REGIONAL SAN MARTIN DISTRITO DE MOYOBAMBA DE LA PROVINCIA DE MOYOBAMBA DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "MOYOBAMBA, MOYOBAMBA",
+      "provincia": "MOYOBAMBA",
+      "distrito": "MOYOBAMBA",
+      "monto": 70010743.39,
+      "financista": "Win Empresas S.AC.",
+      "responsable": "OPIPS: EINEBER SILVA",
+      "funcion": "PLANEAMIENTO, GESTIÓN Y RESERVA DE CONTINGENCIA",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "5. Convocatoria",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "SUSPEDIDO",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: EINEBER SILVA"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Evaluar retrotraer a convocatoria\n",
+        "responsable": "OPIPS: EINEBER SILVA",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2663930,
+    "info": {
+      "nombre": "MEJORAMIENTO DEL SERVICIO DE TRANSITABILIDAD VIAL INTERURBANA EN LA RUTA DEPARTAMENTAL SM-105, EN EL PUENTE DE CAYNARACHI, CRUCE DEL RIO CAYNARACHI DISTRITO DE BARRANQUITA - PROVINCIA DE LAMAS - DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "BARRANQUITA, LAMAS",
+      "provincia": "LAMAS",
+      "distrito": "BARRANQUITA",
+      "monto": 89773423.77,
+      "financista": "SUPERCONCRETO DEL PERU",
+      "responsable": "OPIPS: EINEBER SILVA, ESLANDER, EFRAIN",
+      "funcion": "TRANSPORTE",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "5. Convocatoria",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Convocado 10.07.26",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: EINEBER SILVA, ESLANDER, EFRAIN"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Proceso de selección en curso",
+        "responsable": "OPIPS: EINEBER SILVA, ESLANDER, EFRAIN",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2702636,
+    "info": {
+      "nombre": "ADQUISICION DE AMBULANCIA URBANA Y AMBULANCIA RURAL; EN VEINTICINCO ESTABLECIMIENTOS DE SALUD I.4, ESTABLECIMIENTOS DE SALUD I.2, ESTABLECIMIENTOS DE SALUD I.3, ESTABLECIMIENTOS DE SALUD I.1 A NIVEL DEPARTAMENTAL (SAN MARTIN)",
+      "ubicacion": "VARIOS, VARIOS",
+      "provincia": "VARIOS",
+      "distrito": "VARIOS",
+      "monto": 14246738.61,
+      "financista": "PESCO PERU SAC",
+      "responsable": "OPIPS: Nathali",
+      "funcion": "SALUD",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "7. Elaboración de ET",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Presentación de Doc Equiv. 23.07",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Nathali"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Evaluación de Doc Equivalente",
+        "responsable": "OPIPS: Nathali",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2702629,
+    "info": {
+      "nombre": "ADQUISICION DE AMBULANCIA URBANA Y AMBULANCIA RURAL; EN TRES ESTABLECIMIENTOS DE SALUD II.E , ESTABLECIMIENTOS DE SALUD II.1 A NIVEL DEPARTAMENTAL (SAN MARTIN)",
+      "ubicacion": "VARIOS, VARIOS",
+      "provincia": "VARIOS",
+      "distrito": "VARIOS",
+      "monto": 2862726.3,
+      "financista": "PESCO PERU SAC",
+      "responsable": "OPIPS: Nathali",
+      "funcion": "SALUD",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "7. Elaboración de ET",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Presentación de Doc Equiv. 23.07",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Nathali"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Evaluación de Doc Equivalente",
+        "responsable": "OPIPS: Nathali",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2657516,
+    "info": {
+      "nombre": "CREACION DEL SERVICIO DE MOVILIDAD URBANA EN LA ZONA SURESTE DEL SECTOR SEGUNDA JERUSALEN – I ETAPA DISTRITO DE ELIAS SOPLIN VARGAS DE LA PROVINCIA DE RIOJA DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "SEGUNDA JERUSALEN, RIOJA",
+      "provincia": "RIOJA",
+      "distrito": "SEGUNDA JERUSALEN",
+      "monto": 19937736.84,
+      "financista": "CEMENTOS SELVA",
+      "responsable": "OPIPS: Alex Peña",
+      "funcion": "TRANSPORTE",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "5. Convocatoria",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Proceso en curso",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Alex Peña"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Aprobar ET Actualización",
+        "responsable": "OPIPS: Alex Peña",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2657517,
+    "info": {
+      "nombre": "CREACION DEL SERVICIO DE MOVILIDAD URBANA EN LA ZONA NORESTE DEL SECTOR SEGUNDA JERUSALEN - I ETAPA DISTRITO DE ELIAS SOPLIN VARGAS DE LA PROVINCIA DE RIOJA DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "SEGUNDA JERUSALEN, RIOJA",
+      "provincia": "RIOJA",
+      "distrito": "SEGUNDA JERUSALEN",
+      "monto": 8309127.3,
+      "financista": "CEMENTOS SELVA",
+      "responsable": "OPIPS: Alex Peña",
+      "funcion": "TRANSPORTE",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "5. Convocatoria",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Proceso en curso",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Alex Peña"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Aprobar ET Actualización",
+        "responsable": "OPIPS: Alex Peña",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2657518,
+    "info": {
+      "nombre": "CREACION DEL SERVICIO DE MOVILIDAD URBANA EN EL SECTOR SINAI - I ETAPA, DE LA LOCALIDAD DE SEGUNDA JERUSALEN-AZUNGUILLO DISTRITO DE ELIAS SOPLIN VARGAS DE LA PROVINCIA DE RIOJA DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "SEGUNDA JERUSALEN, RIOJA",
+      "provincia": "RIOJA",
+      "distrito": "SEGUNDA JERUSALEN",
+      "monto": 14329824.06,
+      "financista": "CEMENTOS SELVA",
+      "responsable": "OPIPS: Alex Peña",
+      "funcion": "TRANSPORTE",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "5. Convocatoria",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Proceso en curso",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Alex Peña"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Aprobar ET Actualización",
+        "responsable": "OPIPS: Alex Peña",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2534665,
+    "info": {
+      "nombre": "MEJORAMIENTO DE LA CARRETERA VECINAL EN LA RUTA N° SM - 660 EN EL TRAMO CONVENTO - PINTUYAQUILLO - PINTUYACU - NUEVO LAMAS - COPAL, DISTRITO DE CAYNARACHI - PROVINCIA DE LAMAS - DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "CAYNARACHI, LAMAS",
+      "provincia": "LAMAS",
+      "distrito": "CAYNARACHI",
+      "monto": 81079983.25,
+      "financista": "CONSORCIO CONVENTO",
+      "responsable": "OPIPS:  Alex Garcia",
+      "funcion": "TRANSPORTE",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "5. Convocatoria",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Buena Pro 07.07.26",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS:  Alex Garcia"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Perfeccionamiento de convenio",
+        "responsable": "OPIPS:  Alex Garcia",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2703633,
+    "info": {
+      "nombre": "MEJORAMIENTO DE LOS SERVICIOS OPERATIVOS O MISIONALES INSTITUCIONALES EN 3 UNIDADES PRODUCTORAS DISTRITOS DE RIOJA, TARAPOTO DE LAS PROVINCIAS DE RIOJA, SAN MARTIN DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "VARIOS, VARIOS",
+      "provincia": "VARIOS",
+      "distrito": "VARIOS",
+      "monto": 112855366.52,
+      "financista": "Win Empresas S.AC.",
+      "responsable": "\nOPIPS: Alex",
+      "funcion": "PLANEAMIENTO, GESTIÓN Y RESERVA DE CONTINGENCIA",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "7. Elaboración de ET",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Inicio de plazo 09.07.26",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "\nOPIPS: Alex"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Evaluacion de Plan de Trabajo",
+        "responsable": "\nOPIPS: Alex",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2570362,
+    "info": {
+      "nombre": "MEJORAMIENTO Y AMPLIACION DE LOS SERVICIOS DE SALUD EN EL HOSPITAL II-E LAMAS DISTRITO DE LAMAS - PROVINCIA DE LAMAS - DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "LAMAS, LAMAS",
+      "provincia": "LAMAS",
+      "distrito": "LAMAS",
+      "monto": 309007092.89,
+      "financista": "Win Empresas S.AC.",
+      "responsable": "OPIPS: Daniel Tantalean y Lenin Rojas",
+      "funcion": "SALUD",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "5. Convocatoria",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "2da convocatoria 24.07.26",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Daniel Tantalean y Lenin Rojas"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Retrotraer convocatoria",
+        "responsable": "OPIPS: Daniel Tantalean y Lenin Rojas",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2701843,
+    "info": {
+      "nombre": "MEJORAMIENTO DEL SERVICIO DE EDUCACIÓN SECUNDARIA EN I.E. COAR SAN MARTIN DISTRITO DE MOYOBAMBA DE LA PROVINCIA DE MOYOBAMBA DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "MOYOBAMBA, MOYOBAMBA",
+      "provincia": "MOYOBAMBA",
+      "distrito": "MOYOBAMBA",
+      "monto": 117729315.28,
+      "financista": "CONSORCIO COAR",
+      "responsable": "OPIPS: Natalie Leveau y Eineber Silva",
+      "funcion": "EDUCACION",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "6. Buena Pro",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Firma de convenio 05.08.26",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Natalie Leveau y Eineber Silva"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Firma de Convenio 01.08.26",
+        "responsable": "OPIPS: Natalie Leveau y Eineber Silva",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2711687,
+    "info": {
+      "nombre": "MEJORAMIENTO DE LOS SERVICIOS DE INFORMACIÓN EN 58 UNIDADES PRODUCTORAS 3 CENTROS POBLADOS 37 DISTRITOS DE 10 PROVINCIAS DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "VARIOS, VARIOS",
+      "provincia": "VARIOS",
+      "distrito": "VARIOS",
+      "monto": 141712796.86,
+      "financista": "Win Empresas S.AC.",
+      "responsable": "OPIPS: Natalie",
+      "funcion": "PLANEAMIENTO, GESTIÓN Y RESERVA DE CONTINGENCIA",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "5. Convocatoria",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "SUSPENDIDO",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Natalie"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Presentación de Oferta 14.07.26",
+        "responsable": "OPIPS: Natalie",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2704939,
+    "info": {
+      "nombre": "MEJORAMIENTO Y AMPLIACION DEL SERVICIO DE SEGURIDAD CIUDADANA LOCAL EN SERENAZGO DE MOYOBAMBA DISTRITO DE MOYOBAMBA DE LA PROVINCIA DE MOYOBAMBA DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "MOYOBAMBA, MOYOBAMBA",
+      "provincia": "MOYOBAMBA",
+      "distrito": "MOYOBAMBA",
+      "monto": 17712667.58,
+      "financista": "SONDA",
+      "responsable": "OPIPS: Eineber Silva y Daniel Tantalean",
+      "funcion": "ORDEN PÚBLICO Y SEGURIDAD",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "7. Elaboración de ET",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Inicio de plazo 02.07.26",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Eineber Silva y Daniel Tantalean"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Evaluacion de exp tecnico",
+        "responsable": "OPIPS: Eineber Silva y Daniel Tantalean",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2710007,
+    "info": {
+      "nombre": "MEJORAMIENTO Y AMPLIACION DE LOS SERVICIOS DE PREVENCIÓN, PREPARACIÓN Y RESPUESTA A DESASTRES, INCENDIOS, EMERGENCIAS, RESCATES Y OTROS. EN 3 UNIDADES PRODUCTORAS 3 DISTRITOS DE 3 PROVINCIAS DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "VARIOS, VARIOS",
+      "provincia": "VARIOS",
+      "distrito": "VARIOS",
+      "monto": 49234042.98,
+      "financista": "MEMPHIS MAQUINARIAS SAC",
+      "responsable": "OPIPS: Lenin Rojas",
+      "funcion": "ORDEN PÚBLICO Y SEGURIDAD",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "ACTIVO",
+      "etapa": "6. Buena Pro",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Buena Pro 05.08.26",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Lenin Rojas"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Buena pro 24.07.26",
+        "responsable": "OPIPS: Lenin Rojas",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2623830,
+    "info": {
+      "nombre": "CREACION DEL SERVICIO DE PRÁCTICA DEPORTIVA Y/O RECREATIVA EN POLIDEPORTIVO MUNICIPAL EN EL SECTOR JAZMIN DE LOS NARANJOS DISTRITO DE CALZADA DE LA PROVINCIA DE MOYOBAMBA",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 0,
+      "financista": "CONSTRUCTORA FISA SAC",
+      "responsable": "OPIPS: Daniel Tantalean",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "4. Aprobación de bases",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Apto convocar",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Daniel Tantalean"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "En espera",
+        "responsable": "OPIPS: Daniel Tantalean",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2724535,
+    "info": {
+      "nombre": "ADQUISICION DE MODULO DE ATENCION MOVIL Y LABORATORIO MOVIL; EN EL(LA) CENTRO DE SALUD NUEVA RIOJA DISTRITO DE RIOJA, PROVINCIA RIOJA, DEPARTAMENTO SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 20526222.8,
+      "financista": "MEMPHIS MAQUINARIAS SAC",
+      "responsable": "OPIPS: Lenin, Alex, Eslander",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "4. Aprobación de bases",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Implementar recomendaciones CGR",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Lenin, Alex, Eslander"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Envío a informe previo CGR 22.05.26",
+        "responsable": "OPIPS: Lenin, Alex, Eslander",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2724536,
+    "info": {
+      "nombre": "ADQUISICION DE MODULO DE ATENCION MOVIL Y LABORATORIO MOVIL; EN EL(LA) PUERTO PIZANA DISTRITO DE POLVORA, PROVINCIA TOCACHE, DEPARTAMENTO SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 20526222.8,
+      "financista": "MEMPHIS MAQUINARIAS SAC",
+      "responsable": "OPIPS: Lenin, Alex, Eslander",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "4. Aprobación de bases",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Implementar recomendaciones CGR",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Lenin, Alex, Eslander"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Envío a informe previo CGR 22.05.26",
+        "responsable": "OPIPS: Lenin, Alex, Eslander",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2723526,
+    "info": {
+      "nombre": "ADQUISICION DE MODULO DE ATENCION MOVIL Y LABORATORIO MOVIL; EN EL(LA) MORALES DISTRITO DE MORALES, PROVINCIA SAN MARTIN, DEPARTAMENTO SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 20526222.8,
+      "financista": "MEMPHIS MAQUINARIAS SAC",
+      "responsable": "OPIPS: Lenin, Alex, Eslander",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "4. Aprobación de bases",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Implementar recomendaciones CGR",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "OPIPS: Lenin, Alex, Eslander"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Envío a informe previo CGR 22.05.26",
+        "responsable": "OPIPS: Lenin, Alex, Eslander",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2531750,
+    "info": {
+      "nombre": "MEJORAMIENTO DE LA VIA DEPARTAMENTAL RUTA SM-119 TRAMO ALTO CUÑUMBUZA-SHANSHO-CENTRO AMERICA-PUERTO BERMUDEZ DEL DISTRITO DE CAMPANILLA - PROVINCIA DE MARISCAL CACERES - DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 87877995.26,
+      "financista": "FALTA OFERTANTE",
+      "responsable": "Nathali, Rocio, esther",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "2. Solicitud de informe Previo a CGR",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Actos previos preparar",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "Nathali, Rocio, esther"
+      }
+    ],
+    "proximasAcciones": [],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2359207,
+    "info": {
+      "nombre": "MEJORAMIENTO DE LOS SERVICIOS DE ATENCIÓN BÁSICA DE SALUD EN EL CENTRO POBLADO DE NARANJILLO, DISTRITO DE NUEVA CAJAMARCA - RIOJA - SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 19562489.15,
+      "financista": "FALTA OFERTANTE",
+      "responsable": "Nathali, Rocio, esther",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "0. En trámite de priorización",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Actos previos preparar",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "Nathali, Rocio, esther"
+      }
+    ],
+    "proximasAcciones": [],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2540133,
+    "info": {
+      "nombre": "MEJORAMIENTO Y AMPLIACION DE LOS SERVICIOS DE SALUD DEL ESTABLECIMIENTO DE SALUD NARANJOS DEL DISTRITO DE PARDO MIGUEL - PROVINCIA DE RIOJA - DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 63043952.96,
+      "financista": "FALTA OFERTANTE",
+      "responsable": "Stan by",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "0. En trámite de priorización",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "En tramite de priorización",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "Stan by"
+      }
+    ],
+    "proximasAcciones": [],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2472445,
+    "info": {
+      "nombre": "MEJORAMIENTO Y AMPLIACION DEL SERVICIO DE EDUCACIÓN BASICA REGULAR DE LA I.E. SANTA ROSA, DE LA CIUDAD DE TARAPOTO , DEL DISTRITO DE TARAPOTO - PROVINCIA DE SAN MARTIN - DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 47269839.95,
+      "financista": "FALTA OFERTANTE",
+      "responsable": "Lenin, UF PEHCBM",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "0. En trámite de priorización",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Solicita autorizacion aumento de monto",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "Lenin, UF PEHCBM"
+      }
+    ],
+    "proximasAcciones": [],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2625926,
+    "info": {
+      "nombre": "MEJORAMIENTO Y AMPLIACION DEL SERVICIO DE EDUCACIÓN SECUNDARIA EN I.E. OFELIA VELASQUEZ DISTRITO DE LA BANDA DE SHILCAYO DE LA PROVINCIA DE SAN MARTIN DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 87025419.13,
+      "financista": "FALTA OFERTANTE",
+      "responsable": "Stan by",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "0. En trámite de priorización",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "En tramite de priorización.ANIN",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "Stan by"
+      }
+    ],
+    "proximasAcciones": [],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2287651,
+    "info": {
+      "nombre": "MEJORAMIENTO DE LOS SERVICIOS DE ADMINISTRACION DE JUSTICIA EN LA SEDE DE MOYOBAMBA- PROVINCIA DE MOYOBAMBA - DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 19817074.13,
+      "financista": "FALTA OFERTANTE",
+      "responsable": "Lenin",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "0. En trámite de priorización",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Coordinar Activación UF PJ, Migración PMI",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "Lenin"
+      }
+    ],
+    "proximasAcciones": [
+      {
+        "que": "Tramite insistencia de priorizacion",
+        "responsable": "Lenin",
+        "fechaLimite": "",
+        "hecho": false
+      }
+    ],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2698321,
+    "info": {
+      "nombre": "MEJORAMIENTO Y AMPLIACION DEL SERVICIO DE EDUCACIÓN INICIAL, SERVICIO DE EDUCACION PRIMARIA Y SERVICIO DE EDUCACIÓN SECUNDARIA EN I.E. CLEOFE AREVALO DEL AGUILA DE CENTRO POBLADO LA BANDA DE SHILCAYO DISTRITO DE LA BANDA DE SHILCAYO DE LA PROVINCIA DE SAN MARTIN DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 55387778.48,
+      "financista": "FALTA OFERTANTE",
+      "responsable": "Lenin, UF PEHCBM",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "0. En trámite de priorización",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Informe tecnico delegar",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "Lenin, UF PEHCBM"
+      }
+    ],
+    "proximasAcciones": [],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2628724,
+    "info": {
+      "nombre": "MEJORAMIENTO Y AMPLIACION DE ATENCIÓN DE SERVICIOS DE SALUD HOSPITALARIOS EN HOSPITAL JUANJUI DISTRITO DE JUANJUI DE LA PROVINCIA DE MARISCAL CACERES DEL DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 257449131.81,
+      "financista": "SUPER CONCRETO DEL PERU",
+      "responsable": "Nathali",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "0. En trámite de priorización",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [
+      {
+        "fecha": "2026-08-21",
+        "situacionEncontrada": "Informe Previo 15.08.26",
+        "observacion": "",
+        "accionRealizada": "",
+        "responsable": "Nathali"
+      }
+    ],
+    "proximasAcciones": [],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2540062,
+    "info": {
+      "nombre": "MEJORAMIENTO Y AMPLIACION DE LOS SERVICIOS DE SALUD DEL ESTABLECIMIENTO DE SALUD NUEVO PROGRESO DEL DISTRITO DE NUEVO PROGRESO - PROVINCIA DE TOCACHE - DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 67024278.68,
+      "financista": "Sin financista registrado",
+      "responsable": "Sin asignar",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "Sin etapa",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [],
+    "proximasAcciones": [],
+    "etapaFechas": {},
+    "documentos": []
+  },
+  {
+    "cui": 2540068,
+    "info": {
+      "nombre": "MEJORAMIENTO Y AMPLIACION DE LOS SERVICIOS DE SALUD DEL ESTABLECIMIENTO DE SALUD SAUCE DEL DISTRITO DE SAUCE - PROVINCIA DE SAN MARTIN - DEPARTAMENTO DE SAN MARTIN",
+      "ubicacion": "Sin ubicación registrada",
+      "provincia": "Sin registrar",
+      "distrito": "Sin registrar",
+      "monto": 48885862.73,
+      "financista": "Sin financista registrado",
+      "responsable": "Sin asignar",
+      "funcion": "Sin función registrada",
+      "unidadFormuladora": "Sin registrar",
+      "unidadEjecutora": "Sin registrar",
+      "fechaRegistro": ""
+    },
+    "situacion": {
+      "estado": "Sin dato",
+      "etapa": "Sin etapa",
+      "ultimaActualizacion": "2026-08-21",
+      "avanceFisico": 0,
+      "avanceFinanciero": 0
+    },
+    "seguimientoLog": [],
+    "proximasAcciones": [],
+    "etapaFechas": {},
+    "documentos": []
+  }
+]
