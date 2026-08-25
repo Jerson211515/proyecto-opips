@@ -39,7 +39,15 @@
       }
     ],
     "etapaFechas": {},
-    "documentos": []
+    "documentos": [
+      {
+        "nombre": "Acta de inicio de funciones.",
+        "fase": "0. En trámite de priorización",
+        "tipo": "Acuerdo Regional N°119-2025-GRSM-CR",
+        "fecha": "2025-09-03",
+        "link": "https://drive.google.com/drive/folders/1uNxav6xapTnt5owJ7jji_Kcb3ReeXFvb"
+      }
+    ]
   },
   {
     "cui": 2663930,
