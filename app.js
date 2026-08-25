@@ -52,7 +52,7 @@ function escapeHtml(s){ if (s===undefined||s===null) return ''; return String(s)
 let STATE = {
   projects: [], view: 'home', currentCui: null, activeTab: 'resumen',
   search: '', filterEtapa: '', loaded: false,
-  editMode: false, dirty: false, saving: false, saveMsg: '', showNewForm: false
+  editMode: false, dirty: false, saving: false, saveMsg: '', showNewForm: false, editingDocIdx: null
 };
 
 // ============ CARGA DE DATOS (lectura pública, sin token) ============
@@ -606,18 +606,26 @@ function renderDocumentos(cui){
   const p=getProject(cui);
   if(!p) return '<p>Proyecto no encontrado.</p>';
   const byFase={}; ETAPAS.forEach(e=>byFase[e]=[]);
-  p.documentos.forEach(d=>{ if(!byFase[d.fase]) byFase[d.fase]=[]; byFase[d.fase].push(d); });
+  p.documentos.forEach((d,idx)=>{ if(!byFase[d.fase]) byFase[d.fase]=[]; byFase[d.fase].push(Object.assign({idx},d)); });
   const groups=ETAPAS.map(fase=>{
     const docs=byFase[fase]||[];
     if(docs.length===0) return '';
     const items=docs.map(d=>`
       <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f0f0f0">
         <div><p style="font-size:13.5px;margin:0;font-weight:600">${escapeHtml(d.nombre)}</p><p style="font-size:12px;color:#9ca3af;margin:2px 0 0">${escapeHtml(d.tipo||'Documento')} ${d.fecha?'· '+fmtDate(d.fecha):''}</p></div>
-        ${d.link?`<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" style="font-size:12.5px;color:#1d4ed8;font-weight:600"><i class="ti ti-external-link"></i> Abrir</a>`:'<span style="font-size:12px;color:#9ca3af">Sin link</span>'}
+        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+          ${d.link?`<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" style="font-size:12.5px;color:#1d4ed8;font-weight:600"><i class="ti ti-external-link"></i> Abrir</a>`:'<span style="font-size:12px;color:#9ca3af">Sin link</span>'}
+          ${STATE.editMode ? `
+          <button class="exd-doc-edit" data-idx="${d.idx}" title="Editar" style="background:transparent;border:none;cursor:pointer;color:#6b7280;padding:2px;display:flex"><i class="ti ti-pencil" style="font-size:15px"></i></button>
+          <button class="exd-doc-del" data-idx="${d.idx}" title="Eliminar" style="background:transparent;border:none;cursor:pointer;color:#c0392b;padding:2px;display:flex"><i class="ti ti-trash" style="font-size:15px"></i></button>
+          ` : ''}
+        </div>
       </div>`).join('');
     return `<div style="margin-bottom:16px"><p style="font-size:12.5px;font-weight:700;color:#4b5563;margin:0 0 6px">${escapeHtml(fase)}</p>${items}</div>`;
   }).join('');
-  const faseOptions=ETAPAS.map(e=>`<option value="${escapeHtml(e)}">${escapeHtml(e)}</option>`).join('');
+  const editingIdx = STATE.editingDocIdx;
+  const editingDoc = (editingIdx!=null && p.documentos[editingIdx]) ? p.documentos[editingIdx] : null;
+  const faseOptions=ETAPAS.map(e=>`<option value="${escapeHtml(e)}" ${editingDoc&&editingDoc.fase===e?'selected':''}>${escapeHtml(e)}</option>`).join('');
   return `
     <button id="exd-back-docs" style="background:transparent;border:none;color:#1d4ed8;font-size:13.5px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px">
       <i class="ti ti-arrow-left"></i> Volver al expediente
@@ -628,14 +636,17 @@ function renderDocumentos(cui){
     <div class="exd-card" style="margin-bottom:14px">${groups || '<p style="font-size:13px;color:#6b7280">Aún no hay documentos registrados para este proyecto.</p>'}</div>
     ${STATE.editMode ? `
     <div class="exd-card">
-      <h3 style="margin:0 0 12px;font-size:15px">Agregar documento</h3>
+      <h3 style="margin:0 0 12px;font-size:15px">${editingDoc ? 'Editar documento' : 'Agregar documento'}</h3>
       <div style="display:flex;flex-direction:column;gap:8px;max-width:420px">
-        <input id="exd-doc-nombre" class="exd-input" placeholder="Nombre del documento">
+        <input id="exd-doc-nombre" class="exd-input" placeholder="Nombre del documento" value="${editingDoc?escapeHtml(editingDoc.nombre):''}">
         <select id="exd-doc-fase" class="exd-select">${faseOptions}</select>
-        <input id="exd-doc-tipo" class="exd-input" placeholder="Tipo (informe, resolución, acta...)">
-        <input id="exd-doc-fecha" class="exd-input" type="date">
-        <input id="exd-doc-link" class="exd-input" placeholder="Link de Drive (https://...)">
-        <button id="exd-doc-save" class="exd-btn" style="align-self:flex-start">Agregar documento</button>
+        <input id="exd-doc-tipo" class="exd-input" placeholder="Tipo (informe, resolución, acta...)" value="${editingDoc?escapeHtml(editingDoc.tipo||''):''}">
+        <input id="exd-doc-fecha" class="exd-input" type="date" value="${editingDoc?escapeHtml(editingDoc.fecha||''):''}">
+        <input id="exd-doc-link" class="exd-input" placeholder="Link de Drive (https://...)" value="${editingDoc?escapeHtml(editingDoc.link||''):''}">
+        <div style="display:flex;gap:8px">
+          <button id="exd-doc-save" class="exd-btn" style="align-self:flex-start">${editingDoc?'Guardar cambios':'Agregar documento'}</button>
+          ${editingDoc?`<button id="exd-doc-cancel" class="exd-btn-outline" style="align-self:flex-start">Cancelar</button>`:''}
+        </div>
       </div>
     </div>` : `<p class="exd-lock-note"><i class="ti ti-lock"></i> Activa el modo edición para agregar documentos.</p>`}
     ${saveBarHtml()}
@@ -643,16 +654,36 @@ function renderDocumentos(cui){
 }
 function wireDocumentos(){
   const cui=STATE.currentCui;
-  document.getElementById('exd-back-docs').addEventListener('click',()=>{STATE.view='detail';render();});
+  document.getElementById('exd-back-docs').addEventListener('click',()=>{STATE.editingDocIdx=null;STATE.view='detail';render();});
   wireSaveBar();
+  document.querySelectorAll('.exd-doc-edit').forEach(btn=>btn.addEventListener('click', e=>{
+    STATE.editingDocIdx = Number(e.currentTarget.dataset.idx);
+    render();
+  }));
+  document.querySelectorAll('.exd-doc-del').forEach(btn=>btn.addEventListener('click', e=>{
+    const idx = Number(e.currentTarget.dataset.idx);
+    if(!confirm('¿Eliminar este documento? Esta acción no se puede deshacer.')) return;
+    const p=getProject(cui);
+    p.documentos.splice(idx,1);
+    if(STATE.editingDocIdx===idx) STATE.editingDocIdx=null;
+    markDirty(); render();
+  }));
+  const docCancel=document.getElementById('exd-doc-cancel');
+  if(docCancel) docCancel.addEventListener('click', ()=>{ STATE.editingDocIdx=null; render(); });
   const docSave=document.getElementById('exd-doc-save');
   if(docSave) docSave.addEventListener('click', ()=>{
     const nombre=document.getElementById('exd-doc-nombre').value.trim();
     if(!nombre){ alert('Escribe el nombre del documento antes de guardar.'); return; }
     const p=getProject(cui);
-    p.documentos.push({ nombre, fase:document.getElementById('exd-doc-fase').value,
+    const docData = { nombre, fase:document.getElementById('exd-doc-fase').value,
       tipo:document.getElementById('exd-doc-tipo').value.trim(), fecha:document.getElementById('exd-doc-fecha').value,
-      link:document.getElementById('exd-doc-link').value.trim() });
+      link:document.getElementById('exd-doc-link').value.trim() };
+    if(STATE.editingDocIdx!=null && p.documentos[STATE.editingDocIdx]){
+      p.documentos[STATE.editingDocIdx] = docData;
+    } else {
+      p.documentos.push(docData);
+    }
+    STATE.editingDocIdx=null;
     markDirty(); render();
   });
 }
