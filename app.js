@@ -55,7 +55,8 @@ let STATE = {
   projects: [], view: 'dashboard', currentCui: null, activeTab: 'resumen',
   search: '', filterEtapa: '', filterRiesgo: false, loaded: false,
   editMode: false, dirty: false, saving: false, saveMsg: '', showNewForm: false,
-  dashFilterEtapa: '', editingDocIdx: null
+  dashFilterEtapa: '', editingDocIdx: null,
+  carteraView: localStorage.getItem('exd_cartera_view') || 'tarjetas'
 };
 
 // ============ CARGA DE DATOS (lectura pública, sin token) ============
@@ -73,6 +74,7 @@ async function loadData(){
 }
 
 function getProject(cui){ return STATE.projects.find(p => p.cui === cui); }
+function proximaAccionPendiente(p){ return p.proximasAcciones.find(a=>!a.hecho); }
 function markDirty(){ STATE.dirty = true; }
 
 // ============ MODO EDICIÓN ============
@@ -359,7 +361,7 @@ function wireDashboard(){
   });
 }
 
-// ============ CARTERA DE PROYECTOS (tarjetas) ============
+// ============ CARTERA DE PROYECTOS (tarjetas / tabla) ============
 function renderCartera(){
   let filtered=STATE.projects.filter(p=>{
     const ms=!STATE.search||(p.info.nombre+p.cui).toLowerCase().includes(STATE.search.toLowerCase());
@@ -367,6 +369,7 @@ function renderCartera(){
     const mr=!STATE.filterRiesgo||etapaIndex(p.situacion.etapa)<=1;
     return ms&&me&&mr;
   });
+
   const cards=filtered.map(p=>{
     const col=etapaColor(p.situacion.etapa);
     return `<div class="exd-project-card" data-cui="${p.cui}">
@@ -381,9 +384,51 @@ function renderCartera(){
       </div>
     </div>`;
   }).join('');
+
+  const rows=filtered.map(p=>{
+    const col=etapaColor(p.situacion.etapa);
+    const accion=proximaAccionPendiente(p);
+    return `<div class="exd-project-row" data-cui="${p.cui}">
+      <div class="exd-row-main">
+        <p class="exd-row-nombre">${escapeHtml(p.info.nombre.length>90?p.info.nombre.slice(0,90)+'…':p.info.nombre)}</p>
+        <p class="exd-row-cui">CUI ${p.cui} · <i class="ti ti-map-pin"></i> ${escapeHtml(p.info.ubicacion)}</p>
+      </div>
+      <div class="exd-row-etapa"><span class="exd-badge" style="background:${col.bg};color:${col.text}">${escapeHtml(p.situacion.etapa)}</span></div>
+      <div class="exd-row-monto">${fmtMoney(p.info.monto)}</div>
+      <div class="exd-row-resp">${escapeHtml(p.info.responsable||'Sin asignar')}</div>
+      <div class="exd-row-accion">${accion?escapeHtml(accion.que):'<span style="color:#9ca3af">Sin acción pendiente</span>'}</div>
+    </div>`;
+  }).join('');
+
   const etapaOptions=ETAPAS.map(e=>`<option value="${escapeHtml(e)}" ${STATE.filterEtapa===e?'selected':''}>${escapeHtml(e)}</option>`).join('');
+  const isTabla = STATE.carteraView==='tabla';
+
+  const viewToggle = `
+    <div class="exd-view-toggle" role="group">
+      <button id="exd-view-tarjetas" class="exd-view-btn ${!isTabla?'active':''}" title="Vista tarjetas (para presentar)"><i class="ti ti-layout-grid"></i> Tarjetas</button>
+      <button id="exd-view-tabla" class="exd-view-btn ${isTabla?'active':''}" title="Vista tabla (uso interno)"><i class="ti ti-table"></i> Tabla</button>
+    </div>`;
+
+  const listHtml = isTabla
+    ? `<div class="exd-table-wrap">
+        <div class="exd-row-head">
+          <div class="exd-row-main">Proyecto</div>
+          <div class="exd-row-etapa">Etapa</div>
+          <div class="exd-row-monto">Monto</div>
+          <div class="exd-row-resp">Responsable</div>
+          <div class="exd-row-accion">Próxima acción</div>
+        </div>
+        ${rows || '<p style="color:#6b7280;font-size:14px;padding:14px">No hay proyectos que coincidan con la búsqueda.</p>'}
+      </div>`
+    : `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px">
+        ${cards || '<p style="color:#6b7280;font-size:14px">No hay proyectos que coincidan con la búsqueda.</p>'}
+      </div>`;
+
   return `
-    <h2 style="margin:0 0 14px;font-size:18px">Cartera de proyectos</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+      <h2 style="margin:0;font-size:18px">Cartera de proyectos</h2>
+      ${viewToggle}
+    </div>
     ${STATE.editMode ? `
     <div style="margin-bottom:1rem">
       <button id="exd-new-project-toggle" class="exd-btn-outline"><i class="ti ti-plus"></i> Nuevo proyecto</button>
@@ -394,9 +439,7 @@ function renderCartera(){
       <input id="exd-search" class="exd-input" placeholder="Buscar por nombre o CUI" value="${escapeHtml(STATE.search)}" style="flex:2;background:#fff">
       <select id="exd-filter-etapa" class="exd-select" style="flex:1;background:#fff"><option value="">Todas las etapas</option>${etapaOptions}</select>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px">
-      ${cards || '<p style="color:#6b7280;font-size:14px">No hay proyectos que coincidan con la búsqueda.</p>'}
-    </div>
+    ${listHtml}
   `;
 }
 function renderNewProjectForm(){
@@ -468,6 +511,13 @@ function wireCartera(){
   document.querySelectorAll('.exd-project-card').forEach(c=>c.addEventListener('click',()=>{
     STATE.currentCui=Number(c.dataset.cui); STATE.view='detail'; STATE.activeTab='resumen'; render();
   }));
+  document.querySelectorAll('.exd-project-row').forEach(r=>r.addEventListener('click',()=>{
+    STATE.currentCui=Number(r.dataset.cui); STATE.view='detail'; STATE.activeTab='resumen'; render();
+  }));
+  const vTarjetas=document.getElementById('exd-view-tarjetas');
+  const vTabla=document.getElementById('exd-view-tabla');
+  if(vTarjetas) vTarjetas.addEventListener('click', ()=>{ STATE.carteraView='tarjetas'; localStorage.setItem('exd_cartera_view','tarjetas'); render(); });
+  if(vTabla) vTabla.addEventListener('click', ()=>{ STATE.carteraView='tabla'; localStorage.setItem('exd_cartera_view','tabla'); render(); });
 }
 
 // ============ ANILLOS Y LÍNEA DE TIEMPO ============
@@ -519,7 +569,7 @@ function renderDetail(cui){
   if(!p) return '<p>Proyecto no encontrado.</p>';
   const col=etapaColor(p.situacion.etapa);
   const lastLog=p.seguimientoLog[p.seguimientoLog.length-1];
-  const nextAccion=p.proximasAcciones.find(a=>!a.hecho);
+  const nextAccion=proximaAccionPendiente(p);
   const ro = !STATE.editMode; // read-only cuando no está en modo edición
 
   const tabs=[['resumen','ti-layout-grid','Resumen'],['seguimiento','ti-clock','Seguimiento'],['responsables','ti-users','Responsables']];
@@ -565,7 +615,7 @@ function renderDetail(cui){
         <div><p class="exd-label"><i class="ti ti-building" style="color:#1d4ed8"></i> Unidad Ejecutora</p><p class="exd-value">${escapeHtml(p.info.unidadEjecutora)}</p></div>
         <div><p class="exd-label"><i class="ti ti-calendar" style="color:#e0a626"></i> Fecha de registro</p><p class="exd-value">${p.info.fechaRegistro?fmtDate(p.info.fechaRegistro):'Sin registrar'}</p></div>
         <div><p class="exd-label"><i class="ti ti-user" style="color:#7c3aed"></i> Responsable</p><p class="exd-value">${escapeHtml(p.info.responsable)}</p></div>
-        <div><p class="exd-label"><i class="ti ti-flag-3" style="color:#c0392b"></i> Próximo hito</p><p class="exd-value">${nextAccion?escapeHtml(nextAccion.que)+(nextAccion.fechaLimite?' · '+fmtDate(nextAccion.fechaLimite):''):'Sin definir'}</p></div>
+        <div><p class="exd-label"><i class="ti ti-flag-3" style="color:#c0392b"></i> Próxima acción</p><p class="exd-value">${nextAccion?escapeHtml(nextAccion.que)+(nextAccion.fechaLimite?' · '+fmtDate(nextAccion.fechaLimite):''):'Sin definir'}</p></div>
       </div>
     `;
   } else if(STATE.activeTab==='seguimiento'){
