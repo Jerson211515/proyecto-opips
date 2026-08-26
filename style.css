@@ -49,6 +49,9 @@ body { margin: 0; padding: 20px; background: #dfe8e4; font-family: 'Segoe UI', A
 
 .exd-lock-note { font-size: 12px; color: #9ca3af; display: flex; align-items: center; gap: 5px; margin: 0 0 10px; }
 
+.exd-bar-fill { transition: width .7s cubic-bezier(.22,.61,.36,1); }
+.exd-donut-arc { transition: stroke-dasharray .7s cubic-bezier(.22,.61,.36,1); }
+
 /* ============ RESPONSIVE (móvil) ============ */
 @media (max-width: 720px) {
   body { padding: 0; }
@@ -67,6 +70,7 @@ body { margin: 0; padding: 20px; background: #dfe8e4; font-family: 'Segoe UI', A
 
   .exd-card { padding: 0.85rem 1rem; }
   .exd-searchrow { flex-direction: column; }
+  .exd-dash-grid { grid-template-columns: 1fr !important; }
   .exd-tabsrow-wrap { flex-direction: column; align-items: stretch !important; gap: 10px; }
   .exd-tabsrow { overflow-x: auto; gap: 14px !important; padding-bottom: 4px; }
   .exd-tab { flex-shrink: 0; }
