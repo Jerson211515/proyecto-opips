@@ -4,7 +4,8 @@ body { margin: 0; padding: 20px; background: #dfe8e4; font-family: 'Segoe UI', A
 
 .exd { font-family: inherit; color: #1f2937; background: #eef3f1; border-radius: 14px; overflow: hidden; border: 1px solid #dde5e2; max-width: 1280px; margin: 0 auto; box-shadow: 0 2px 10px rgba(15,61,46,0.08); }
 .exd-header { background: #0f3d2e; padding: 14px 20px; display: flex; align-items: center; gap: 14px; color: #fff; }
-.exd-logo { width: 38px; height: 38px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 19px; color: #0f3d2e; }
+.exd-logo { width: 38px; height: 38px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 19px; color: #0f3d2e; overflow: hidden; }
+.exd-logo img { width: 100%; height: 100%; object-fit: cover; }
 .exd-h-title { font-size: 11px; font-weight: 700; letter-spacing: .03em; opacity: .85; margin: 0; }
 .exd-h-sub { font-size: 15px; font-weight: 600; margin: 2px 0 0; }
 .exd-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1d6b4f; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
@@ -52,6 +53,27 @@ body { margin: 0; padding: 20px; background: #dfe8e4; font-family: 'Segoe UI', A
 .exd-bar-fill { transition: width .7s cubic-bezier(.22,.61,.36,1); }
 .exd-donut-arc { transition: stroke-dasharray .7s cubic-bezier(.22,.61,.36,1); }
 
+/* ============ TOGGLE TARJETAS / TABLA ============ */
+.exd-view-toggle { display: flex; background: #fff; border: 1px solid #e5e9e7; border-radius: 8px; padding: 3px; gap: 2px; }
+.exd-view-btn { background: transparent; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12.5px; font-weight: 600; color: #6b7280; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.exd-view-btn.active { background: #0f3d2e; color: #fff; }
+
+/* ============ VISTA TABLA DE PROYECTOS ============ */
+.exd-table-wrap { background: #fff; border: 1px solid #e5e9e7; border-radius: 12px; overflow: hidden; }
+.exd-row-head { display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: #f7faf9; font-size: 11.5px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: .02em; border-bottom: 1px solid #e5e9e7; }
+.exd-project-row { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+.exd-project-row:last-child { border-bottom: none; }
+.exd-project-row:hover { background: #f7faf9; }
+.exd-row-main { flex: 2.2; min-width: 0; }
+.exd-row-nombre { font-size: 13.5px; font-weight: 600; margin: 0 0 3px; color: #1f2937; line-height: 1.35; }
+.exd-row-cui { font-size: 11.5px; color: #9ca3af; margin: 0; }
+.exd-row-etapa { flex: 1.1; flex-shrink: 0; }
+.exd-row-monto { flex: 0.9; flex-shrink: 0; font-size: 13px; font-weight: 600; color: #1f2937; }
+.exd-row-resp { flex: 1.2; flex-shrink: 0; font-size: 12.5px; color: #4b5563; }
+.exd-row-accion { flex: 1.6; flex-shrink: 0; font-size: 12.5px; color: #1f2937; }
+.exd-row-head .exd-row-main, .exd-row-head .exd-row-etapa, .exd-row-head .exd-row-monto, .exd-row-head .exd-row-resp, .exd-row-head .exd-row-accion { flex: unset; }
+.exd-row-head .exd-row-main { flex: 2.2; } .exd-row-head .exd-row-etapa { flex: 1.1; } .exd-row-head .exd-row-monto { flex: 0.9; } .exd-row-head .exd-row-resp { flex: 1.2; } .exd-row-head .exd-row-accion { flex: 1.6; }
+
 /* ============ RESPONSIVE (móvil) ============ */
 @media (max-width: 720px) {
   body { padding: 0; }
@@ -74,4 +96,10 @@ body { margin: 0; padding: 20px; background: #dfe8e4; font-family: 'Segoe UI', A
   .exd-tabsrow-wrap { flex-direction: column; align-items: stretch !important; gap: 10px; }
   .exd-tabsrow { overflow-x: auto; gap: 14px !important; padding-bottom: 4px; }
   .exd-tab { flex-shrink: 0; }
+  .exd-row-head { display: none; }
+  .exd-project-row { flex-wrap: wrap; gap: 6px 10px; }
+  .exd-row-main { flex: 1 1 100%; }
+  .exd-row-etapa, .exd-row-monto, .exd-row-resp, .exd-row-accion { flex: unset; font-size: 12px; }
+  .exd-row-accion::before { content: "Próxima acción: "; color: #9ca3af; }
+  .exd-row-resp::before { content: "Responsable: "; color: #9ca3af; }
 }
