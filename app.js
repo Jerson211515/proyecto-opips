@@ -42,6 +42,8 @@ function etapaColor(e){
 }
 function groupLabel(e){ return etapaMeta(e).fase; }
 const GROUP_COLORS = {'Priorización':'#e24b4a','Actos Previos':'#e0a626','Proceso de Selección':'#378add','Ejecución':'#1d9e75'};
+const CHART_PALETTE = ['#1d4ed8','#0f9d58','#e0a626','#7c3aed','#c0392b','#0891b2','#db2777','#65a30d','#f97316','#4338ca'];
+const SIN_REGISTRAR_COLOR = '#9ca3af';
 
 function fmtMoney(n){ if (!n) return 'S/ 0'; return 'S/ ' + Number(n).toLocaleString('es-PE',{maximumFractionDigits:0}); }
 function todayISO(){ return new Date().toISOString().slice(0,10); }
@@ -50,9 +52,10 @@ function escapeHtml(s){ if (s===undefined||s===null) return ''; return String(s)
 
 // ============ ESTADO ============
 let STATE = {
-  projects: [], view: 'home', currentCui: null, activeTab: 'resumen',
-  search: '', filterEtapa: '', loaded: false,
-  editMode: false, dirty: false, saving: false, saveMsg: '', showNewForm: false, editingDocIdx: null
+  projects: [], view: 'dashboard', currentCui: null, activeTab: 'resumen',
+  search: '', filterEtapa: '', filterRiesgo: false, loaded: false,
+  editMode: false, dirty: false, saving: false, saveMsg: '', showNewForm: false,
+  dashFilterEtapa: '', editingDocIdx: null
 };
 
 // ============ CARGA DE DATOS (lectura pública, sin token) ============
@@ -159,7 +162,8 @@ function render(){
   }
 
   sidebar.innerHTML = renderSidebar(); wireSidebar();
-  if (STATE.view === 'home'){ main.innerHTML = renderHome(); wireHome(); }
+  if (STATE.view === 'dashboard'){ main.innerHTML = renderDashboard(); wireDashboard(); }
+  else if (STATE.view === 'cartera'){ main.innerHTML = renderCartera(); wireCartera(); }
   else if (STATE.view === 'detail'){ main.innerHTML = renderDetail(STATE.currentCui); wireDetail(); }
   else if (STATE.view === 'documentos'){ main.innerHTML = renderDocumentos(STATE.currentCui); wireDocumentos(); }
 }
@@ -197,8 +201,8 @@ function renderSidebar(){
     `<div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#4b5563;padding:1px 0"><span style="width:8px;height:8px;border-radius:50%;background:${GROUP_COLORS[g]};flex-shrink:0"></span>${g} (${groups[g]})</div>`
   ).join('');
   return `
-    <div class="exd-nav ${STATE.view==='home'&&!STATE.filterEtapa&&!STATE.filterRiesgo?'active':''}" data-nav="dashboard"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
-    <div class="exd-nav" data-nav="cartera"><i class="ti ti-folders"></i>Cartera de proyectos</div>
+    <div class="exd-nav ${STATE.view==='dashboard'?'active':''}" data-nav="dashboard"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+    <div class="exd-nav ${STATE.view==='cartera'?'active':''}" data-nav="cartera"><i class="ti ti-folders"></i>Cartera de proyectos</div>
     <p style="font-size:10.5px;color:#9ca3af;font-weight:700;letter-spacing:.04em;margin:16px 4px 4px">ACCESOS RÁPIDOS</p>
     <div class="exd-quick" data-nav="ejecucion"><i class="ti ti-player-play" style="color:#0f9d58"></i>Proyectos en ejecución</div>
     <div class="exd-quick" data-nav="riesgo"><i class="ti ti-alert-triangle" style="color:#c0392b"></i>Proyectos en riesgo</div>
@@ -219,18 +223,144 @@ function renderSidebar(){
 function wireSidebar(){
   const d=document.querySelector('[data-nav="dashboard"]'), c=document.querySelector('[data-nav="cartera"]');
   const ej=document.querySelector('[data-nav="ejecucion"]'), rg=document.querySelector('[data-nav="riesgo"]');
-  if(d) d.addEventListener('click',()=>{STATE.view='home';STATE.filterEtapa='';STATE.filterRiesgo=false;render();});
-  if(c) c.addEventListener('click',()=>{STATE.view='home';STATE.filterRiesgo=false;render();});
-  if(ej) ej.addEventListener('click',()=>{STATE.view='home';STATE.filterEtapa='8. Ejecución Física';STATE.filterRiesgo=false;render();});
-  if(rg) rg.addEventListener('click',()=>{STATE.view='home';STATE.filterEtapa='';STATE.filterRiesgo=true;render();});
+  if(d) d.addEventListener('click',()=>{STATE.view='dashboard';STATE.dashFilterEtapa='';render();});
+  if(c) c.addEventListener('click',()=>{STATE.view='cartera';STATE.filterEtapa='';STATE.filterRiesgo=false;render();});
+  if(ej) ej.addEventListener('click',()=>{STATE.view='cartera';STATE.filterEtapa='8. Ejecución Física';STATE.filterRiesgo=false;render();});
+  if(rg) rg.addEventListener('click',()=>{STATE.view='cartera';STATE.filterEtapa='';STATE.filterRiesgo=true;render();});
 }
 
-// ============ HOME ============
-function renderHome(){
+// ============ DASHBOARD (vista inicial) ============
+function renderDashboard(){
   const total=STATE.projects.length;
   const montoTotal=STATE.projects.reduce((a,p)=>a+(p.info.monto||0),0);
-  const enEjecucion=STATE.projects.filter(p=>etapaIndex(p.situacion.etapa)===8).length;
+  const enElaboracionET=STATE.projects.filter(p=>etapaIndex(p.situacion.etapa)===7).length;
   const enConvocatoria=STATE.projects.filter(p=>etapaIndex(p.situacion.etapa)===5).length;
+
+  // El gráfico de Etapa siempre muestra el total (es el disparador del filtro). Se ocultan las etapas sin proyectos.
+  const filtered = STATE.dashFilterEtapa ? STATE.projects.filter(p=>p.situacion.etapa===STATE.dashFilterEtapa) : STATE.projects;
+
+  const etapaCounts = ETAPAS.map(e=>({ etapa:e, count: STATE.projects.filter(p=>p.situacion.etapa===e).length })).filter(x=>x.count>0);
+  const maxEtapa = Math.max(1, ...etapaCounts.map(x=>x.count));
+  const etapaBars = etapaCounts.map(({etapa,count})=>{
+    const isActive = STATE.dashFilterEtapa===etapa;
+    const pct = (count/maxEtapa)*100;
+    const barColor = isActive ? '#0f3d2e' : (count>0 ? '#a8c9bd' : '#e5e9e7');
+    return `<div class="exd-barrow" data-etapa="${escapeHtml(etapa)}" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:5px 4px;border-radius:6px;${isActive?'background:#e8f2ee':''}">
+      <span style="font-size:11.5px;color:${isActive?'#0f3d2e':'#6b7280'};font-weight:${isActive?'700':'500'};width:150px;flex-shrink:0;line-height:1.25">${escapeHtml(etapaShort(etapa))}</span>
+      <div style="flex:1;background:#f3f4f6;border-radius:5px;height:20px;position:relative;overflow:hidden">
+        <div class="exd-bar-fill" data-w="${pct}" style="width:0%;background:${barColor};height:100%;border-radius:5px"></div>
+      </div>
+      <span style="font-size:12px;font-weight:700;color:#1f2937;width:18px;text-align:right;flex-shrink:0">${count}</span>
+    </div>`;
+  }).join('');
+
+  const funcionMap={};
+  filtered.forEach(p=>{ const f=p.info.funcion||'Sin función registrada'; funcionMap[f]=(funcionMap[f]||0)+1; });
+  const funcionArr=Object.entries(funcionMap).sort((a,b)=>b[1]-a[1]);
+  const maxFuncion=Math.max(1,...funcionArr.map(x=>x[1]));
+  const funcionBars = funcionArr.map(([f,count],i)=>{
+    const pct=(count/maxFuncion)*100;
+    const color = f==='Sin función registrada' ? SIN_REGISTRAR_COLOR : CHART_PALETTE[i%CHART_PALETTE.length];
+    return `<div style="display:flex;align-items:center;gap:8px;padding:5px 4px">
+      <span style="font-size:11.5px;color:#4b5563;width:150px;flex-shrink:0;line-height:1.25">${escapeHtml(f)}</span>
+      <div style="flex:1;background:#f3f4f6;border-radius:5px;height:20px;position:relative;overflow:hidden">
+        <div class="exd-bar-fill" data-w="${pct}" style="width:0%;background:${color};height:100%;border-radius:5px"></div>
+      </div>
+      <span style="font-size:12px;font-weight:700;color:#1f2937;width:18px;text-align:right;flex-shrink:0">${count}</span>
+    </div>`;
+  }).join('') || '<p style="font-size:12.5px;color:#9ca3af">Sin proyectos para mostrar.</p>';
+
+  const provMap={};
+  filtered.forEach(p=>{ const pr=(p.info.provincia&&p.info.provincia!=='Sin registrar')?p.info.provincia:'Sin registrar'; provMap[pr]=(provMap[pr]||0)+1; });
+  const provArr=Object.entries(provMap).sort((a,b)=>b[1]-a[1]);
+  const provTotal=filtered.length||1;
+  const provColorFor=(name,i)=> name==='Sin registrar' ? SIN_REGISTRAR_COLOR : CHART_PALETTE[i%CHART_PALETTE.length];
+  let accP=0; const RP=40,CP=2*Math.PI*RP;
+  const provArcs=provArr.map(([name,count],i)=>{
+    const frac=count/provTotal, dash=frac*CP, offset=accP*CP; accP+=frac;
+    return `<circle class="exd-donut-arc" cx="50" cy="50" r="${RP}" fill="none" stroke="${provColorFor(name,i)}" stroke-width="13" stroke-dasharray="0 ${CP}" data-dasharray="${dash} ${CP-dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 50 50)"/>`;
+  }).join('');
+  const provLegend=provArr.map(([name,count],i)=>
+    `<div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#4b5563;padding:1px 0"><span style="width:8px;height:8px;border-radius:50%;background:${provColorFor(name,i)};flex-shrink:0"></span>${escapeHtml(name)} (${count})</div>`
+  ).join('');
+
+  // ET/DE (Expediente Técnico / Documento Equivalente) — mini donut, ceros ocultos
+  const ETDE_COLORS = {'SI':'#0f9d58','NO':'#1d4ed8','Sin registrar':SIN_REGISTRAR_COLOR};
+  const etdeMap={};
+  filtered.forEach(p=>{ const v=p.info.etDe||'Sin registrar'; etdeMap[v]=(etdeMap[v]||0)+1; });
+  const etdeArr=Object.entries(etdeMap).filter(([,c])=>c>0);
+  const etdeTotal=filtered.length||1;
+  let accE=0; const RE=28,CE=2*Math.PI*RE;
+  const etdeArcs=etdeArr.map(([name,count])=>{
+    const frac=count/etdeTotal, dash=frac*CE, offset=accE*CE; accE+=frac;
+    return `<circle class="exd-donut-arc" cx="50" cy="50" r="${RE}" fill="none" stroke="${ETDE_COLORS[name]||SIN_REGISTRAR_COLOR}" stroke-width="12" stroke-dasharray="0 ${CE}" data-dasharray="${dash} ${CE-dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 50 50)"/>`;
+  }).join('');
+  const etdeLegend=etdeArr.map(([name,count])=>
+    `<div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#4b5563;padding:1px 0"><span style="width:8px;height:8px;border-radius:50%;background:${ETDE_COLORS[name]||SIN_REGISTRAR_COLOR};flex-shrink:0"></span>${escapeHtml(name)} (${count})</div>`
+  ).join('');
+
+  return `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:1.25rem">
+      <div class="exd-card"><p class="exd-label">Proyectos</p><p style="font-size:22px;font-weight:700;margin:0">${total}</p></div>
+      <div class="exd-card"><p class="exd-label">Monto total</p><p style="font-size:22px;font-weight:700;margin:0">${fmtMoney(montoTotal)}</p></div>
+      <div class="exd-card"><p class="exd-label">En Elaboración de ET</p><p style="font-size:22px;font-weight:700;margin:0;color:#0f9d58">${enElaboracionET}</p></div>
+      <div class="exd-card"><p class="exd-label">En convocatoria</p><p style="font-size:22px;font-weight:700;margin:0;color:#1d4ed8">${enConvocatoria}</p></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px;align-items:start" class="exd-dash-grid">
+      <div class="exd-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h3 style="margin:0;font-size:13.5px">Inversiones por Etapa</h3>
+          ${STATE.dashFilterEtapa ? `<button id="exd-dash-clear" style="background:transparent;border:none;color:#1d4ed8;font-size:11.5px;font-weight:600;cursor:pointer;padding:0"><i class="ti ti-x"></i> Quitar filtro</button>` : ''}
+        </div>
+        <div>${etapaBars}</div>
+      </div>
+      <div class="exd-card">
+        <h3 style="margin:0 0 8px;font-size:13.5px">Inversiones por Función</h3>
+        <div>${funcionBars}</div>
+      </div>
+      <div class="exd-card">
+        <h3 style="margin:0 0 8px;font-size:13.5px">Inversiones por Provincia</h3>
+        <div style="display:flex;align-items:center;gap:12px">
+          <svg viewBox="0 0 100 100" style="width:100px;height:100px;flex-shrink:0">
+            ${provArcs}
+            <text x="50" y="47" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">${filtered.length}</text>
+            <text x="50" y="60" text-anchor="middle" font-size="7.5" fill="#6b7280">proyectos</text>
+          </svg>
+          <div>${provLegend}</div>
+        </div>
+        <div style="border-top:1px solid #f0f0f0;margin-top:12px;padding-top:10px">
+          <h3 style="margin:0 0 8px;font-size:12px;color:#4b5563">ET/DE (Expediente Técnico / Doc. Equivalente)</h3>
+          <div style="display:flex;align-items:center;gap:12px">
+            <svg viewBox="0 0 100 100" style="width:76px;height:76px;flex-shrink:0">
+              ${etdeArcs}
+            </svg>
+            <div>${etdeLegend}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function wireDashboard(){
+  document.querySelectorAll('.exd-barrow').forEach(row=>row.addEventListener('click',()=>{
+    const e=row.dataset.etapa;
+    STATE.dashFilterEtapa = (STATE.dashFilterEtapa===e) ? '' : e;
+    render();
+  }));
+  const clearBtn=document.getElementById('exd-dash-clear');
+  if(clearBtn) clearBtn.addEventListener('click', e=>{ e.stopPropagation(); STATE.dashFilterEtapa=''; render(); });
+
+  // Animación de entrada: arranca en 0 y crece hasta el valor real (carga inicial y cada cambio de filtro)
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      document.querySelectorAll('.exd-bar-fill').forEach(el=>{ el.style.width = el.dataset.w + '%'; });
+      document.querySelectorAll('.exd-donut-arc').forEach(el=>{ el.setAttribute('stroke-dasharray', el.dataset.dasharray); });
+    });
+  });
+}
+
+// ============ CARTERA DE PROYECTOS (tarjetas) ============
+function renderCartera(){
   let filtered=STATE.projects.filter(p=>{
     const ms=!STATE.search||(p.info.nombre+p.cui).toLowerCase().includes(STATE.search.toLowerCase());
     const me=!STATE.filterEtapa||p.situacion.etapa===STATE.filterEtapa;
@@ -253,12 +383,7 @@ function renderHome(){
   }).join('');
   const etapaOptions=ETAPAS.map(e=>`<option value="${escapeHtml(e)}" ${STATE.filterEtapa===e?'selected':''}>${escapeHtml(e)}</option>`).join('');
   return `
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:1.25rem">
-      <div class="exd-card"><p class="exd-label">Proyectos</p><p style="font-size:22px;font-weight:700;margin:0">${total}</p></div>
-      <div class="exd-card"><p class="exd-label">Monto total</p><p style="font-size:22px;font-weight:700;margin:0">${fmtMoney(montoTotal)}</p></div>
-      <div class="exd-card"><p class="exd-label">En ejecución física</p><p style="font-size:22px;font-weight:700;margin:0;color:#0f9d58">${enEjecucion}</p></div>
-      <div class="exd-card"><p class="exd-label">En convocatoria</p><p style="font-size:22px;font-weight:700;margin:0;color:#1d4ed8">${enConvocatoria}</p></div>
-    </div>
+    <h2 style="margin:0 0 14px;font-size:18px">Cartera de proyectos</h2>
     ${STATE.editMode ? `
     <div style="margin-bottom:1rem">
       <button id="exd-new-project-toggle" class="exd-btn-outline"><i class="ti ti-plus"></i> Nuevo proyecto</button>
@@ -299,7 +424,7 @@ function renderNewProjectForm(){
   `;
 }
 
-function wireHome(){
+function wireCartera(){
   const npToggle=document.getElementById('exd-new-project-toggle');
   if(npToggle) npToggle.addEventListener('click', ()=>{ STATE.showNewForm=!STATE.showNewForm; render(); });
   const npCancel=document.getElementById('exd-np-cancel');
@@ -324,7 +449,7 @@ function wireHome(){
         financista: document.getElementById('exd-np-financista').value.trim() || 'Sin financista registrado',
         responsable: document.getElementById('exd-np-responsable').value.trim() || 'Sin asignar',
         funcion: document.getElementById('exd-np-funcion').value.trim() || 'Sin función registrada',
-        unidadFormuladora: 'Sin registrar', unidadEjecutora: 'Sin registrar', fechaRegistro: todayISO()
+        unidadFormuladora: 'Sin registrar', unidadEjecutora: 'Sin registrar', fechaRegistro: todayISO(), etDe: 'Sin registrar'
       },
       situacion: { estado: 'Sin dato', etapa: document.getElementById('exd-np-etapa').value, ultimaActualizacion: todayISO(), avanceFisico: 0, avanceFinanciero: 0 },
       seguimientoLog: [], proximasAcciones: [], etapaFechas: {}, documentos: []
@@ -546,7 +671,7 @@ function renderDetail(cui){
 
 function wireDetail(){
   const cui=STATE.currentCui;
-  document.getElementById('exd-back').addEventListener('click',()=>{STATE.view='home';render();});
+  document.getElementById('exd-back').addEventListener('click',()=>{STATE.view='cartera';render();});
   document.getElementById('exd-go-docs').addEventListener('click',()=>{STATE.view='documentos';render();});
   document.querySelectorAll('.exd-tab').forEach(t=>t.addEventListener('click',()=>{STATE.activeTab=t.dataset.tab;render();}));
   wireSaveBar();
