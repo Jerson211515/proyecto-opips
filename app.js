@@ -8,7 +8,9 @@ const CONFIG = {
   owner: "Jerson211515",
   repo: "proyecto-opips",
   branch: "main",
-  dataPath: "data.json"
+  dataPath: "data.json",
+  sheetId: "133yE1YF5dc3SAWOqsXjHPLsskgZ1sI2UVB-P619Snh4",
+  sheetUrl: "https://docs.google.com/spreadsheets/d/133yE1YF5dc3SAWOqsXjHPLsskgZ1sI2UVB-P619Snh4/edit"
 };
 
 // ============ ETAPAS Y COLORES ============
@@ -54,17 +56,84 @@ function escapeHtml(s){ if (s===undefined||s===null) return ''; return String(s)
 let STATE = {
   projects: [], view: 'dashboard', currentCui: null, activeTab: 'resumen',
   search: '', filterEtapa: '', filterRiesgo: false, loaded: false,
-  editMode: false, dirty: false, saving: false, saveMsg: '', showNewForm: false,
+  editMode: false, dirty: false, saving: false, saveMsg: '',
   dashFilterEtapa: '', editingDocIdx: null,
   carteraView: localStorage.getItem('exd_cartera_view') || 'tarjetas'
 };
 
-// ============ CARGA DE DATOS (lectura pública, sin token) ============
+// ============ CARGA DE DATOS (Google Sheets = Cartera/Seguimiento/Acciones · GitHub = Documentos) ============
+function gvizDateToISO(v){
+  if (typeof v === 'string' && v.indexOf('Date(') === 0){
+    const nums = v.match(/-?\d+/g).map(Number);
+    const [y,m,d] = nums;
+    return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+  }
+  return v || '';
+}
+async function fetchGvizSheet(tabName){
+  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tabName)}&t=${Date.now()}`;
+  const res = await fetch(url);
+  const text = await res.text();
+  const jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}')+1);
+  const json = JSON.parse(jsonStr);
+  const cols = json.table.cols.map(c=>c.label);
+  return (json.table.rows||[]).map(r=>{
+    const obj={};
+    cols.forEach((c,i)=>{ obj[c] = (r.c && r.c[i]) ? r.c[i].v : null; });
+    return obj;
+  });
+}
+
 async function loadData(){
   try {
-    const res = await fetch('data.json?t=' + Date.now());
-    if (!res.ok) throw new Error('No se pudo leer data.json');
-    STATE.projects = await res.json();
+    const [carteraRows, seguimientoRows, accionesRows, docRes] = await Promise.all([
+      fetchGvizSheet('Cartera'),
+      fetchGvizSheet('Seguimiento'),
+      fetchGvizSheet('ProximasAcciones'),
+      fetch('data.json?t=' + Date.now())
+    ]);
+    if (!docRes.ok) throw new Error('No se pudo leer data.json (documentos)');
+    const docData = await docRes.json();
+    const docsByCui = {};
+    docData.forEach(d => { docsByCui[Number(d.cui)] = d.documentos || []; });
+
+    STATE.projects = carteraRows.filter(r=>r.CUI!=null).map(row=>{
+      const cui = Number(row.CUI);
+      return {
+        cui,
+        info: {
+          nombre: row.Nombre || '',
+          ubicacion: [row.Distrito, row.Provincia].filter(Boolean).join(', ') || 'Sin ubicación registrada',
+          provincia: row.Provincia || 'Sin registrar',
+          distrito: row.Distrito || 'Sin registrar',
+          monto: Number(row.Monto) || 0,
+          financista: row.Financista || 'Sin financista registrado',
+          responsable: row.Responsable || 'Sin asignar',
+          funcion: row.Funcion || 'Sin función registrada',
+          unidadFormuladora: row.UnidadFormuladora || 'Sin registrar',
+          unidadEjecutora: row.UnidadEjecutora || 'Sin registrar',
+          fechaRegistro: ''
+        },
+        situacion: {
+          estado: row.Estado || 'Sin dato',
+          etapa: row.Etapa || ETAPAS[0],
+          ultimaActualizacion: gvizDateToISO(row.UltimaActualizacion),
+          avanceFisico: Number(row.AvanceFisico) || 0,
+          avanceFinanciero: Number(row.AvanceFinanciero) || 0
+        },
+        seguimientoLog: seguimientoRows.filter(s=>Number(s.CUI)===cui).map(s=>({
+          fecha: gvizDateToISO(s.Fecha), situacionEncontrada: s.SituacionEncontrada || '',
+          observacion: s.Observacion || '', accionRealizada: s.AccionRealizada || '', responsable: s.Responsable || ''
+        })),
+        proximasAcciones: accionesRows.filter(a=>Number(a.CUI)===cui).map(a=>({
+          que: a.Que || '', responsable: a.Responsable || '',
+          fechaLimite: gvizDateToISO(a.FechaLimite),
+          hecho: String(a.Hecho).toUpperCase()==='TRUE'
+        })),
+        etapaFechas: {},
+        documentos: docsByCui[cui] || []
+      };
+    });
   } catch(e){
     console.error(e);
     STATE.loadError = true;
@@ -123,12 +192,13 @@ async function saveToGitHub(){
     }
     const getData = await getRes.json();
     const sha = getData.sha;
-    const jsonStr = JSON.stringify(STATE.projects, null, 2);
+    const soloDocumentos = STATE.projects.map(p => ({ cui: p.cui, documentos: p.documentos }));
+    const jsonStr = JSON.stringify(soloDocumentos, null, 2);
     const content = btoa(unescape(encodeURIComponent(jsonStr)));
     const putRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${dataPath}`, {
       method: 'PUT',
       headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'Actualiza data.json desde el expediente digital', content, sha, branch })
+      body: JSON.stringify({ message: 'Actualiza documentos desde el expediente digital', content, sha, branch })
     });
     if (!putRes.ok){
       const err = await putRes.json().catch(()=>({}));
@@ -153,13 +223,13 @@ function render(){
 
   editBtn.classList.toggle('on', STATE.editMode);
   editBtn.innerHTML = STATE.editMode
-    ? '<i class="ti ti-lock-open" aria-hidden="true"></i> Edición activa'
-    : '<i class="ti ti-lock" aria-hidden="true"></i> Modo edición';
+    ? '<i class="ti ti-lock-open" aria-hidden="true"></i> Edición de documentos activa'
+    : '<i class="ti ti-lock" aria-hidden="true"></i> Editar documentos';
   saveIndicator.textContent = STATE.saveMsg || '';
 
   if (!STATE.loaded){ main.innerHTML = '<p style="color:#6b7280;font-size:14px">Cargando expedientes...</p>'; sidebar.innerHTML=''; return; }
   if (STATE.loadError){
-    main.innerHTML = '<div class="exd-card" style="border-color:#f0997b"><p style="margin:0;font-weight:700;color:#c0392b"><i class="ti ti-alert-triangle" aria-hidden="true"></i> No se pudo cargar data.json. Verifica que el archivo exista en el repositorio y que la página se esté sirviendo desde GitHub Pages (no abierta como archivo local).</p></div>';
+    main.innerHTML = '<div class="exd-card" style="border-color:#f0997b"><p style="margin:0;font-weight:700;color:#c0392b"><i class="ti ti-alert-triangle" aria-hidden="true"></i> No se pudo cargar la información. Verifica que la Hoja de Google esté compartida como "Cualquiera con el enlace - Lector" y que data.json exista en el repositorio.</p></div>';
     sidebar.innerHTML=''; return;
   }
 
@@ -404,9 +474,12 @@ function renderCartera(){
   const isTabla = STATE.carteraView==='tabla';
 
   const viewToggle = `
-    <div class="exd-view-toggle" role="group">
-      <button id="exd-view-tarjetas" class="exd-view-btn ${!isTabla?'active':''}" title="Vista tarjetas (para presentar)"><i class="ti ti-layout-grid"></i> Tarjetas</button>
-      <button id="exd-view-tabla" class="exd-view-btn ${isTabla?'active':''}" title="Vista tabla (uso interno)"><i class="ti ti-table"></i> Tabla</button>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <div class="exd-view-toggle" role="group">
+        <button id="exd-view-tarjetas" class="exd-view-btn ${!isTabla?'active':''}" title="Vista tarjetas (para presentar)"><i class="ti ti-layout-grid"></i> Tarjetas</button>
+        <button id="exd-view-tabla" class="exd-view-btn ${isTabla?'active':''}" title="Vista tabla (uso interno)"><i class="ti ti-table"></i> Tabla</button>
+      </div>
+      <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> Editar en Google Sheets</a>
     </div>`;
 
   const listHtml = isTabla
@@ -429,12 +502,6 @@ function renderCartera(){
       <h2 style="margin:0;font-size:18px">Cartera de proyectos</h2>
       ${viewToggle}
     </div>
-    ${STATE.editMode ? `
-    <div style="margin-bottom:1rem">
-      <button id="exd-new-project-toggle" class="exd-btn-outline"><i class="ti ti-plus"></i> Nuevo proyecto</button>
-    </div>
-    ${STATE.showNewForm ? renderNewProjectForm() : ''}
-    ` : ''}
     <div class="exd-searchrow" style="display:flex;gap:10px;margin-bottom:1rem">
       <input id="exd-search" class="exd-input" placeholder="Buscar por nombre o CUI" value="${escapeHtml(STATE.search)}" style="flex:2;background:#fff">
       <select id="exd-filter-etapa" class="exd-select" style="flex:1;background:#fff"><option value="">Todas las etapas</option>${etapaOptions}</select>
@@ -442,67 +509,8 @@ function renderCartera(){
     ${listHtml}
   `;
 }
-function renderNewProjectForm(){
-  const etapaOptions=ETAPAS.map(e=>`<option value="${escapeHtml(e)}">${escapeHtml(e)}</option>`).join('');
-  return `
-    <div class="exd-card" style="margin-bottom:1rem">
-      <h3 style="margin:0 0 12px;font-size:15px">Nuevo proyecto</h3>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:10px">
-        <div><p class="exd-label">CUI *</p><input id="exd-np-cui" class="exd-input" type="number" placeholder="Ej. 2500123"></div>
-        <div><p class="exd-label">Monto (S/)</p><input id="exd-np-monto" class="exd-input" type="number" placeholder="0"></div>
-        <div><p class="exd-label">Provincia</p><input id="exd-np-provincia" class="exd-input" placeholder="Provincia"></div>
-        <div><p class="exd-label">Distrito</p><input id="exd-np-distrito" class="exd-input" placeholder="Distrito"></div>
-        <div><p class="exd-label">Financista</p><input id="exd-np-financista" class="exd-input" placeholder="Financista"></div>
-        <div><p class="exd-label">Responsable</p><input id="exd-np-responsable" class="exd-input" placeholder="Responsable OPIPS"></div>
-        <div><p class="exd-label">Función</p><input id="exd-np-funcion" class="exd-input" placeholder="Ej. Transporte, Educación..."></div>
-        <div><p class="exd-label">Etapa inicial</p><select id="exd-np-etapa" class="exd-select">${etapaOptions}</select></div>
-      </div>
-      <p class="exd-label">Nombre completo del proyecto *</p>
-      <textarea id="exd-np-nombre" class="exd-textarea" placeholder="Nombre de la inversión" style="margin-bottom:12px"></textarea>
-      <div style="display:flex;gap:10px">
-        <button id="exd-np-save" class="exd-btn">Crear proyecto</button>
-        <button id="exd-np-cancel" class="exd-btn-outline">Cancelar</button>
-      </div>
-    </div>
-  `;
-}
 
 function wireCartera(){
-  const npToggle=document.getElementById('exd-new-project-toggle');
-  if(npToggle) npToggle.addEventListener('click', ()=>{ STATE.showNewForm=!STATE.showNewForm; render(); });
-  const npCancel=document.getElementById('exd-np-cancel');
-  if(npCancel) npCancel.addEventListener('click', ()=>{ STATE.showNewForm=false; render(); });
-  const npSave=document.getElementById('exd-np-save');
-  if(npSave) npSave.addEventListener('click', ()=>{
-    const cui=Number(document.getElementById('exd-np-cui').value);
-    const nombre=document.getElementById('exd-np-nombre').value.trim();
-    if(!cui){ alert('Ingresa un CUI válido.'); return; }
-    if(getProject(cui)){ alert('Ya existe un proyecto con ese CUI.'); return; }
-    if(!nombre){ alert('Ingresa el nombre del proyecto.'); return; }
-    const provincia=document.getElementById('exd-np-provincia').value.trim();
-    const distrito=document.getElementById('exd-np-distrito').value.trim();
-    const nuevo = {
-      cui,
-      info: {
-        nombre,
-        ubicacion: [distrito, provincia].filter(Boolean).join(', ') || 'Sin ubicación registrada',
-        provincia: provincia || 'Sin registrar',
-        distrito: distrito || 'Sin registrar',
-        monto: Number(document.getElementById('exd-np-monto').value) || 0,
-        financista: document.getElementById('exd-np-financista').value.trim() || 'Sin financista registrado',
-        responsable: document.getElementById('exd-np-responsable').value.trim() || 'Sin asignar',
-        funcion: document.getElementById('exd-np-funcion').value.trim() || 'Sin función registrada',
-        unidadFormuladora: 'Sin registrar', unidadEjecutora: 'Sin registrar', fechaRegistro: todayISO(), etDe: 'Sin registrar'
-      },
-      situacion: { estado: 'Sin dato', etapa: document.getElementById('exd-np-etapa').value, ultimaActualizacion: todayISO(), avanceFisico: 0, avanceFinanciero: 0 },
-      seguimientoLog: [], proximasAcciones: [], etapaFechas: {}, documentos: []
-    };
-    STATE.projects.push(nuevo);
-    STATE.showNewForm=false;
-    markDirty();
-    STATE.currentCui=cui; STATE.view='detail'; STATE.activeTab='resumen';
-    render();
-  });
   document.getElementById('exd-search').addEventListener('input', e=>{
     const pos=e.target.selectionStart; STATE.search=e.target.value; render();
     const el=document.getElementById('exd-search'); el.focus(); el.setSelectionRange(pos,pos);
@@ -570,7 +578,6 @@ function renderDetail(cui){
   const col=etapaColor(p.situacion.etapa);
   const lastLog=p.seguimientoLog[p.seguimientoLog.length-1];
   const nextAccion=proximaAccionPendiente(p);
-  const ro = !STATE.editMode; // read-only cuando no está en modo edición
 
   const tabs=[['resumen','ti-layout-grid','Resumen'],['seguimiento','ti-clock','Seguimiento'],['responsables','ti-users','Responsables']];
   const tabsHtml=tabs.map(([k,ic,l])=>`<div class="exd-tab ${STATE.activeTab===k?'active':''}" data-tab="${k}"><i class="ti ${ic}"></i>${l}</div>`).join('');
@@ -627,56 +634,40 @@ function renderDetail(cui){
       <p style="font-size:12px;color:#9ca3af;margin:0">Responsable: ${escapeHtml(l.responsable||'—')}</p>
     </div>`).join('') || '<p style="font-size:13px;color:#6b7280">Sin registros de seguimiento aún.</p>';
     body=`
-      <div class="exd-card" style="margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
-        <div><p class="exd-label">Etapa</p><select id="exd-etapa-select" class="exd-select" ${ro?'disabled':''}>${ETAPAS.map((e,ei)=>`<option value="${escapeHtml(e)}" ${p.situacion.etapa===e?'selected':''}>${escapeHtml(e)} — ${escapeHtml(ETAPA_META[ei].fase)}</option>`).join('')}</select></div>
-        <div><p class="exd-label">Avance físico (%)</p><input id="exd-avance-fisico" class="exd-input" type="number" min="0" max="100" value="${p.situacion.avanceFisico}" ${ro?'disabled':''}></div>
-        <div><p class="exd-label">Avance financiero (%)</p><input id="exd-avance-financiero" class="exd-input" type="number" min="0" max="100" value="${p.situacion.avanceFinanciero}" ${ro?'disabled':''}></div>
+      <div class="exd-card" style="margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
+        <div>
+          <p class="exd-label">Etapa</p>
+          <span class="exd-badge" style="background:${col.bg};color:${col.text}">${escapeHtml(p.situacion.etapa)}</span>
+        </div>
+        <div><p class="exd-label">Avance físico</p><p class="exd-value" style="font-weight:700;font-size:16px">${p.situacion.avanceFisico}%</p></div>
+        <div><p class="exd-label">Avance financiero</p><p class="exd-value" style="font-weight:700;font-size:16px">${p.situacion.avanceFinanciero}%</p></div>
       </div>
       <div class="exd-card">
         <h3 style="margin:0 0 12px;font-size:15px">Bitácora de seguimiento</h3>
-        <div class="exd-loglist" style="margin-bottom:14px">${logItems}</div>
-        ${STATE.editMode ? `
-        <details>
-          <summary style="cursor:pointer;font-size:13px;color:#1d4ed8;font-weight:600">+ Agregar registro de seguimiento</summary>
-          <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
-            <textarea id="exd-log-situacion" class="exd-textarea" placeholder="Situación encontrada"></textarea>
-            <textarea id="exd-log-obs" class="exd-textarea" placeholder="Observación"></textarea>
-            <textarea id="exd-log-accion" class="exd-textarea" placeholder="Acción realizada"></textarea>
-            <input id="exd-log-resp" class="exd-input" placeholder="Responsable">
-            <button id="exd-log-save" class="exd-btn" style="align-self:flex-start">Agregar registro</button>
-          </div>
-        </details>` : `<p class="exd-lock-note"><i class="ti ti-lock"></i> Activa el modo edición para agregar registros.</p>`}
+        <div class="exd-loglist">${logItems}</div>
+        <p class="exd-lock-note" style="margin-top:14px"><i class="ti ti-table"></i> La etapa, avances y nuevos registros de seguimiento se actualizan directo en <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" style="color:#1d4ed8;font-weight:600">Google Sheets</a>, no desde aquí.</p>
       </div>
     `;
   } else if(STATE.activeTab==='responsables'){
-    const accionesItems=p.proximasAcciones.map((a,i)=>`
+    const accionesItems=p.proximasAcciones.map((a)=>`
       <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0">
-        <input type="checkbox" data-idx="${i}" class="exd-accion-check" ${a.hecho?'checked':''} ${ro?'disabled':''} style="margin-top:3px">
+        <i class="ti ${a.hecho?'ti-circle-check':'ti-circle'}" style="font-size:17px;margin-top:2px;color:${a.hecho?'#0f9d58':'#d1d5db'};flex-shrink:0"></i>
         <div style="flex:1">
           <p style="font-size:13.5px;margin:0;text-decoration:${a.hecho?'line-through':'none'};color:${a.hecho?'#9ca3af':'#1f2937'}">${escapeHtml(a.que)}</p>
           <p style="font-size:12px;color:#9ca3af;margin:2px 0 0">${escapeHtml(a.responsable||'Sin asignar')} ${a.fechaLimite?'· vence '+fmtDate(a.fechaLimite):''}</p>
         </div>
       </div>`).join('') || '<p style="font-size:13px;color:#6b7280">Sin próximas acciones registradas.</p>';
     body=`
-      <div class="exd-card" style="margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
-        <div><p class="exd-label">Responsable OPIPS</p><input id="exd-resp-input" class="exd-input" value="${escapeHtml(p.info.responsable)}" ${ro?'disabled':''}></div>
-        <div><p class="exd-label">Financista</p><input id="exd-fin-input" class="exd-input" value="${escapeHtml(p.info.financista)}" ${ro?'disabled':''}></div>
-        <div><p class="exd-label">Unidad Formuladora</p><input id="exd-uf-input" class="exd-input" value="${escapeHtml(p.info.unidadFormuladora)}" ${ro?'disabled':''}></div>
-        <div><p class="exd-label">Unidad Ejecutora</p><input id="exd-ue-input" class="exd-input" value="${escapeHtml(p.info.unidadEjecutora)}" ${ro?'disabled':''}></div>
+      <div class="exd-card" style="margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px 20px">
+        <div><p class="exd-label">Responsable OPIPS</p><p class="exd-value">${escapeHtml(p.info.responsable)}</p></div>
+        <div><p class="exd-label">Financista</p><p class="exd-value">${escapeHtml(p.info.financista)}</p></div>
+        <div><p class="exd-label">Unidad Formuladora</p><p class="exd-value">${escapeHtml(p.info.unidadFormuladora)}</p></div>
+        <div><p class="exd-label">Unidad Ejecutora</p><p class="exd-value">${escapeHtml(p.info.unidadEjecutora)}</p></div>
       </div>
       <div class="exd-card">
         <h3 style="margin:0 0 12px;font-size:15px">Próximas acciones</h3>
-        <div style="margin-bottom:14px">${accionesItems}</div>
-        ${STATE.editMode ? `
-        <details>
-          <summary style="cursor:pointer;font-size:13px;color:#1d4ed8;font-weight:600">+ Agregar próxima acción</summary>
-          <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
-            <input id="exd-accion-que" class="exd-input" placeholder="Qué se debe hacer">
-            <input id="exd-accion-resp" class="exd-input" placeholder="Responsable">
-            <input id="exd-accion-fecha" class="exd-input" type="date">
-            <button id="exd-accion-save" class="exd-btn" style="align-self:flex-start">Agregar acción</button>
-          </div>
-        </details>` : `<p class="exd-lock-note"><i class="ti ti-lock"></i> Activa el modo edición para agregar acciones.</p>`}
+        <div>${accionesItems}</div>
+        <p class="exd-lock-note" style="margin-top:14px"><i class="ti ti-table"></i> Responsables y próximas acciones se actualizan directo en <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" style="color:#1d4ed8;font-weight:600">Google Sheets</a>, no desde aquí.</p>
       </div>
     `;
   }
@@ -712,68 +703,19 @@ function renderDetail(cui){
     </div>
     <div class="exd-tabsrow-wrap" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e9e7;margin-bottom:1rem">
       <div class="exd-tabsrow" style="display:flex;gap:22px">${tabsHtml}</div>
-      <button id="exd-go-docs" class="exd-btn-outline" style="margin-bottom:8px"><i class="ti ti-folder"></i> Documentos</button>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> Editar en Sheets</a>
+        <button id="exd-go-docs" class="exd-btn-outline"><i class="ti ti-folder"></i> Documentos</button>
+      </div>
     </div>
     ${body}
-    ${saveBarHtml()}
   `;
 }
 
 function wireDetail(){
-  const cui=STATE.currentCui;
   document.getElementById('exd-back').addEventListener('click',()=>{STATE.view='cartera';render();});
   document.getElementById('exd-go-docs').addEventListener('click',()=>{STATE.view='documentos';render();});
   document.querySelectorAll('.exd-tab').forEach(t=>t.addEventListener('click',()=>{STATE.activeTab=t.dataset.tab;render();}));
-  wireSaveBar();
-
-  const etapaSel=document.getElementById('exd-etapa-select');
-  if(etapaSel) etapaSel.addEventListener('change', e=>{
-    const p=getProject(cui); p.situacion.etapa=e.target.value; p.situacion.ultimaActualizacion=todayISO();
-    markDirty(); render();
-  });
-  const afInput=document.getElementById('exd-avance-fisico');
-  if(afInput) afInput.addEventListener('change', e=>{
-    const p=getProject(cui); let v=Number(e.target.value); if(isNaN(v)) v=0; v=Math.max(0,Math.min(100,v));
-    p.situacion.avanceFisico=v; markDirty(); render();
-  });
-  const afinInput=document.getElementById('exd-avance-financiero');
-  if(afinInput) afinInput.addEventListener('change', e=>{
-    const p=getProject(cui); let v=Number(e.target.value); if(isNaN(v)) v=0; v=Math.max(0,Math.min(100,v));
-    p.situacion.avanceFinanciero=v; markDirty(); render();
-  });
-  const logSave=document.getElementById('exd-log-save');
-  if(logSave) logSave.addEventListener('click', ()=>{
-    const situ=document.getElementById('exd-log-situacion').value.trim();
-    if(!situ){ alert('Escribe la situación encontrada antes de guardar.'); return; }
-    const p=getProject(cui);
-    p.seguimientoLog.push({ fecha:todayISO(), situacionEncontrada:situ,
-      observacion:document.getElementById('exd-log-obs').value.trim(),
-      accionRealizada:document.getElementById('exd-log-accion').value.trim(),
-      responsable:document.getElementById('exd-log-resp').value.trim() });
-    p.situacion.ultimaActualizacion=todayISO();
-    markDirty(); render();
-  });
-  const respInput=document.getElementById('exd-resp-input');
-  if(respInput) respInput.addEventListener('change', e=>{ getProject(cui).info.responsable=e.target.value; markDirty(); });
-  const finInput=document.getElementById('exd-fin-input');
-  if(finInput) finInput.addEventListener('change', e=>{ getProject(cui).info.financista=e.target.value; markDirty(); render(); });
-  const ufInput=document.getElementById('exd-uf-input');
-  if(ufInput) ufInput.addEventListener('change', e=>{ getProject(cui).info.unidadFormuladora=e.target.value; markDirty(); });
-  const ueInput=document.getElementById('exd-ue-input');
-  if(ueInput) ueInput.addEventListener('change', e=>{ getProject(cui).info.unidadEjecutora=e.target.value; markDirty(); });
-  const accionSave=document.getElementById('exd-accion-save');
-  if(accionSave) accionSave.addEventListener('click', ()=>{
-    const que=document.getElementById('exd-accion-que').value.trim();
-    if(!que){ alert('Escribe qué se debe hacer antes de guardar.'); return; }
-    const p=getProject(cui);
-    p.proximasAcciones.push({ que, responsable:document.getElementById('exd-accion-resp').value.trim(),
-      fechaLimite:document.getElementById('exd-accion-fecha').value, hecho:false });
-    markDirty(); render();
-  });
-  document.querySelectorAll('.exd-accion-check').forEach(chk=>chk.addEventListener('change', e=>{
-    getProject(cui).proximasAcciones[Number(e.target.dataset.idx)].hecho=e.target.checked;
-    markDirty(); render();
-  }));
 }
 
 // ============ DOCUMENTOS ============
