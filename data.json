@@ -4,7 +4,7 @@
     "documentos": [
       {
         "nombre": "Acuerdo de Consejo Regional N° 119-2025-GRSM/CR",
-        "fase": "0. En trámite de priorización",
+        "fase": "1. Inversión priorizada con acuerdo de consejo",
         "tipo": "Acuerdo de Consejo Regional N° 119-2025-GRSM/CR",
         "fecha": "2025-09-03",
         "link": "https://drive.google.com/file/d/1UQnvDX0_F0thkSBnO2sRmRqZ7c3Ey-e5/view?usp=sharing"
@@ -15,6 +15,13 @@
         "tipo": "CARTA N° 005-2025-GRSM/CE-CUI2700931",
         "fecha": "",
         "link": "https://drive.google.com/file/d/1JnWJ4sWom9TBkdJVwrvzh1x2eEV7SotV/view?usp=sharing"
+      },
+      {
+        "nombre": "Informe Previo",
+        "fase": "3. Informe Previo emitido",
+        "tipo": "1. INFORME PREVIO N°006-2026-CG/APP",
+        "fecha": "2026-01-12",
+        "link": "https://drive.google.com/file/d/1jYD3JI6w38lTcvPansJ1V0YVt2vnskZ1/view?usp=sharing"
       }
     ]
   },
