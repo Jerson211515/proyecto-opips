@@ -471,16 +471,17 @@ function renderCartera(){
   }).join('');
 
   const etapaOptions=ETAPAS.map(e=>`<option value="${escapeHtml(e)}" ${STATE.filterEtapa===e?'selected':''}>${escapeHtml(e)}</option>`).join('');
-  const isTabla = STATE.carteraView==='tabla';
+  const isTabla = STATE.editMode && STATE.carteraView==='tabla';
 
-  const viewToggle = `
+  const viewToggle = STATE.editMode ? `
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <div class="exd-view-toggle" role="group">
         <button id="exd-view-tarjetas" class="exd-view-btn ${!isTabla?'active':''}" title="Vista tarjetas (para presentar)"><i class="ti ti-layout-grid"></i> Tarjetas</button>
         <button id="exd-view-tabla" class="exd-view-btn ${isTabla?'active':''}" title="Vista tabla (uso interno)"><i class="ti ti-table"></i> Tabla</button>
       </div>
       <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> Editar en Google Sheets</a>
-    </div>`;
+    </div>` : `
+    <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> Editar en Google Sheets</a>`;
 
   const listHtml = isTabla
     ? `<div class="exd-table-wrap">
