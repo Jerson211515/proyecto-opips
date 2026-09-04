@@ -86,10 +86,11 @@ async function fetchGvizSheet(tabName){
 
 async function loadData(){
   try {
-    const [carteraRows, seguimientoRows, accionesRows, docRes] = await Promise.all([
+    const [carteraRows, seguimientoRows, accionesRows, cronogramaRows, docRes] = await Promise.all([
       fetchGvizSheet('Cartera'),
       fetchGvizSheet('Seguimiento'),
       fetchGvizSheet('ProximasAcciones'),
+      fetchGvizSheet('CronogramaSeleccion'),
       fetch('data.json?t=' + Date.now())
     ]);
     if (!docRes.ok) throw new Error('No se pudo leer data.json (documentos)');
@@ -112,7 +113,9 @@ async function loadData(){
           funcion: row.Funcion || 'Sin función registrada',
           unidadFormuladora: row.UnidadFormuladora || 'Sin registrar',
           unidadEjecutora: row.UnidadEjecutora || 'Sin registrar',
-          fechaRegistro: ''
+          fechaRegistro: '',
+          fechaEnvioInformePrevio: gvizDateToISO(row.FechaEnvioInformePrevio),
+          fechaLimiteInformePrevio: gvizDateToISO(row.FechaLimiteInformePrevio)
         },
         situacion: {
           estado: row.Estado || 'Sin dato',
@@ -130,6 +133,13 @@ async function loadData(){
           fechaLimite: gvizDateToISO(a.FechaLimite),
           hecho: String(a.Hecho).toUpperCase()==='TRUE'
         })),
+        cronograma: cronogramaRows.filter(c=>Number(c.CUI)===cui).map(c=>({
+          proceso: c.Proceso || 'Sin proceso',
+          numConvocatoria: c.NumConvocatoria,
+          hito: c.Hito || '',
+          fechaInicio: gvizDateToISO(c.FechaInicio),
+          fechaFin: gvizDateToISO(c.FechaFin)
+        })).sort((a,b)=>(a.fechaInicio||'').localeCompare(b.fechaInicio||'')),
         etapaFechas: {},
         documentos: docsByCui[cui] || []
       };
@@ -580,7 +590,7 @@ function renderDetail(cui){
   const lastLog=p.seguimientoLog[p.seguimientoLog.length-1];
   const nextAccion=proximaAccionPendiente(p);
 
-  const tabs=[['resumen','ti-layout-grid','Resumen'],['seguimiento','ti-clock','Seguimiento'],['responsables','ti-users','Responsables']];
+  const tabs=[['resumen','ti-layout-grid','Resumen'],['seguimiento','ti-clock','Seguimiento'],['cronograma','ti-calendar-time','Proceso Selección'],['responsables','ti-users','Responsables']];
   const tabsHtml=tabs.map(([k,ic,l])=>`<div class="exd-tab ${STATE.activeTab===k?'active':''}" data-tab="${k}"><i class="ti ${ic}"></i>${l}</div>`).join('');
 
   let body='';
@@ -648,6 +658,42 @@ function renderDetail(cui){
         <div class="exd-loglist">${logItems}</div>
         <p class="exd-lock-note" style="margin-top:14px"><i class="ti ti-table"></i> La etapa, avances y nuevos registros de seguimiento se actualizan directo en <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" style="color:#1d4ed8;font-weight:600">Google Sheets</a>, no desde aquí.</p>
       </div>
+      ${p.info.fechaLimiteInformePrevio ? `
+      <div class="exd-card" style="margin-top:14px;border-color:#f0d78c;background:#fffbea">
+        <p class="exd-label"><i class="ti ti-alert-circle" style="color:#e0a626"></i> Plazo Informe Previo CGR</p>
+        <p style="font-size:13.5px;margin:4px 0 0">Enviado el <b>${fmtDate(p.info.fechaEnvioInformePrevio)}</b> · vence el <b>${fmtDate(p.info.fechaLimiteInformePrevio)}</b></p>
+      </div>` : ''}
+    `;
+  } else if(STATE.activeTab==='cronograma'){
+    const hoy = todayISO();
+    const grupos = {};
+    p.cronograma.forEach(c=>{ const k=c.proceso||'Sin proceso'; if(!grupos[k]) grupos[k]=[]; grupos[k].push(c); });
+    const procesos = Object.keys(grupos);
+    const bloques = procesos.map(proceso=>{
+      const items = grupos[proceso].map(c=>{
+        const vencido = c.fechaFin && c.fechaFin < hoy;
+        const proximo = c.fechaFin && !vencido && (new Date(c.fechaFin) - new Date(hoy))/86400000 <= 3;
+        const color = vencido ? '#c0392b' : proximo ? '#e0a626' : '#0f9d58';
+        const rango = (c.fechaInicio && c.fechaFin && c.fechaInicio!==c.fechaFin)
+          ? `${fmtDate(c.fechaInicio)} – ${fmtDate(c.fechaFin)}` : fmtDate(c.fechaFin || c.fechaInicio);
+        return `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0">
+          <div style="width:9px;height:9px;border-radius:50%;background:${color};margin-top:5px;flex-shrink:0"></div>
+          <div style="flex:1">
+            <p style="font-size:13.5px;font-weight:600;margin:0">${escapeHtml(c.hito)}</p>
+            <p style="font-size:12px;color:#9ca3af;margin:2px 0 0">${escapeHtml(rango)}</p>
+          </div>
+        </div>`;
+      }).join('');
+      const numConv = grupos[proceso][0] && grupos[proceso][0].numConvocatoria;
+      return `<div class="exd-card" style="margin-bottom:14px">
+        <h3 style="margin:0 0 2px;font-size:15px">${escapeHtml(proceso)}</h3>
+        ${numConv?`<p style="font-size:11.5px;color:#9ca3af;margin:0 0 10px">Convocatoria N° ${escapeHtml(String(numConv))}</p>`:'<div style="margin-bottom:10px"></div>'}
+        ${items}
+      </div>`;
+    }).join('');
+    body=`
+      ${bloques || '<div class="exd-card"><p style="font-size:13px;color:#6b7280">Sin cronograma de proceso de selección registrado para este proyecto todavía.</p></div>'}
+      <p class="exd-lock-note"><i class="ti ti-table"></i> El cronograma se actualiza directo en <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" style="color:#1d4ed8;font-weight:600">Google Sheets</a>, a partir de las Circulares publicadas en gob.pe.</p>
     `;
   } else if(STATE.activeTab==='responsables'){
     const accionesItems=p.proximasAcciones.map((a)=>`
