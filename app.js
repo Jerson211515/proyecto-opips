@@ -115,7 +115,9 @@ async function loadData(){
           unidadEjecutora: row.UnidadEjecutora || 'Sin registrar',
           fechaRegistro: '',
           fechaEnvioInformePrevio: gvizDateToISO(row.FechaEnvioInformePrevio),
-          fechaLimiteInformePrevio: gvizDateToISO(row.FechaLimiteInformePrevio)
+          fechaLimiteInformePrevio: gvizDateToISO(row.FechaLimiteInformePrevio),
+          linkInvestInPeruFinancista: row.LinkInvestInPeruFinancista || '',
+          linkInvestInPeruEPS: row.LinkInvestInPeruEPS || ''
         },
         situacion: {
           estado: row.Estado || 'Sin dato',
@@ -326,9 +328,9 @@ function renderDashboard(){
   const etapaBars = etapaCounts.map(({etapa,count})=>{
     const isActive = STATE.dashFilterEtapa===etapa;
     const pct = (count/maxEtapa)*100;
-    const barColor = isActive ? '#0f3d2e' : (count>0 ? '#a8c9bd' : '#e5e9e7');
+    const barColor = isActive ? '#800000' : (count>0 ? '#a8c9bd' : '#e5e9e7');
     return `<div class="exd-barrow" data-etapa="${escapeHtml(etapa)}" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:5px 4px;border-radius:6px;${isActive?'background:#e8f2ee':''}">
-      <span style="font-size:11.5px;color:${isActive?'#0f3d2e':'#6b7280'};font-weight:${isActive?'700':'500'};width:150px;flex-shrink:0;line-height:1.25">${escapeHtml(etapaShort(etapa))}</span>
+      <span style="font-size:11.5px;color:${isActive?'#800000':'#6b7280'};font-weight:${isActive?'700':'500'};width:150px;flex-shrink:0;line-height:1.25">${escapeHtml(etapaShort(etapa))}</span>
       <div style="flex:1;background:#f3f4f6;border-radius:5px;height:20px;position:relative;overflow:hidden">
         <div class="exd-bar-fill" data-w="${pct}" style="width:0%;background:${barColor};height:100%;border-radius:5px"></div>
       </div>
@@ -577,7 +579,7 @@ function renderTimeline(p){
       <span><i class="ti ti-circle-filled" style="font-size:10px;color:#d1d5db"></i> Pendiente</span>
     </div>
     <div style="margin-top:8px;padding:8px 10px;background:#f7faf9;border-radius:8px;font-size:12px;color:#4b5563;line-height:1.5">
-      <b style="color:#0f3d2e">${escapeHtml(curMeta.fase)} · ${escapeHtml(curMeta.articulo)}</b> — ${escapeHtml(curMeta.plazo)}
+      <b style="color:#800000">${escapeHtml(curMeta.fase)} · ${escapeHtml(curMeta.articulo)}</b> — ${escapeHtml(curMeta.plazo)}
       <span style="display:block;font-size:10.5px;color:#9ca3af;margin-top:2px">Reglamento de la Ley N° 29230, D.S. N° 038-2026-EF</span>
     </div>`;
 }
@@ -632,7 +634,7 @@ function renderDetail(cui){
         <div><p class="exd-label"><i class="ti ti-users-group" style="color:#0f9d58"></i> Unidad Formuladora</p><p class="exd-value">${escapeHtml(p.info.unidadFormuladora)}</p></div>
         <div><p class="exd-label"><i class="ti ti-building" style="color:#1d4ed8"></i> Unidad Ejecutora</p><p class="exd-value">${escapeHtml(p.info.unidadEjecutora)}</p></div>
         <div><p class="exd-label"><i class="ti ti-calendar" style="color:#e0a626"></i> Fecha de registro</p><p class="exd-value">${p.info.fechaRegistro?fmtDate(p.info.fechaRegistro):'Sin registrar'}</p></div>
-        <div><p class="exd-label"><i class="ti ti-user" style="color:#7c3aed"></i> Responsable</p><p class="exd-value">${escapeHtml(p.info.responsable)}</p></div>
+        ${STATE.editMode ? `<div><p class="exd-label"><i class="ti ti-user" style="color:#7c3aed"></i> Responsable</p><p class="exd-value">${escapeHtml(p.info.responsable)}</p></div>` : ''}
         <div><p class="exd-label"><i class="ti ti-flag-3" style="color:#c0392b"></i> Próxima acción</p><p class="exd-value">${nextAccion?escapeHtml(nextAccion.que)+(nextAccion.fechaLimite?' · '+fmtDate(nextAccion.fechaLimite):''):'Sin definir'}</p></div>
       </div>
     `;
@@ -642,7 +644,7 @@ function renderDetail(cui){
       <p style="font-size:13.5px;margin:0 0 2px"><b>Situación:</b> ${escapeHtml(l.situacionEncontrada)}</p>
       ${l.observacion?`<p style="font-size:12.5px;color:#6b7280;margin:0 0 2px">Observación: ${escapeHtml(l.observacion)}</p>`:''}
       ${l.accionRealizada?`<p style="font-size:12.5px;color:#6b7280;margin:0 0 2px">Acción: ${escapeHtml(l.accionRealizada)}</p>`:''}
-      <p style="font-size:12px;color:#9ca3af;margin:0">Responsable: ${escapeHtml(l.responsable||'—')}</p>
+      ${STATE.editMode?`<p style="font-size:12px;color:#9ca3af;margin:0">Responsable: ${escapeHtml(l.responsable||'—')}</p>`:''}
     </div>`).join('') || '<p style="font-size:13px;color:#6b7280">Sin registros de seguimiento aún.</p>';
     body=`
       <div class="exd-card" style="margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
@@ -653,6 +655,14 @@ function renderDetail(cui){
         <div><p class="exd-label">Avance físico</p><p class="exd-value" style="font-weight:700;font-size:16px">${p.situacion.avanceFisico}%</p></div>
         <div><p class="exd-label">Avance financiero</p><p class="exd-value" style="font-weight:700;font-size:16px">${p.situacion.avanceFinanciero}%</p></div>
       </div>
+      ${(p.info.linkInvestInPeruFinancista || p.info.linkInvestInPeruEPS) ? `
+      <div class="exd-card" style="margin-bottom:14px">
+        <p class="exd-label" style="margin-bottom:10px">Fuentes oficiales del proceso de selección</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          ${p.info.linkInvestInPeruFinancista ? `<a href="${escapeHtml(p.info.linkInvestInPeruFinancista)}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> InvestInPerú — Financista</a>` : ''}
+          ${p.info.linkInvestInPeruEPS ? `<a href="${escapeHtml(p.info.linkInvestInPeruEPS)}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> InvestInPerú — EPS</a>` : ''}
+        </div>
+      </div>` : ''}
       <div class="exd-card">
         <h3 style="margin:0 0 12px;font-size:15px">Bitácora de seguimiento</h3>
         <div class="exd-loglist">${logItems}</div>
@@ -701,13 +711,14 @@ function renderDetail(cui){
         <i class="ti ${a.hecho?'ti-circle-check':'ti-circle'}" style="font-size:17px;margin-top:2px;color:${a.hecho?'#0f9d58':'#d1d5db'};flex-shrink:0"></i>
         <div style="flex:1">
           <p style="font-size:13.5px;margin:0;text-decoration:${a.hecho?'line-through':'none'};color:${a.hecho?'#9ca3af':'#1f2937'}">${escapeHtml(a.que)}</p>
-          <p style="font-size:12px;color:#9ca3af;margin:2px 0 0">${escapeHtml(a.responsable||'Sin asignar')} ${a.fechaLimite?'· vence '+fmtDate(a.fechaLimite):''}</p>
+          ${(STATE.editMode || a.fechaLimite) ? `<p style="font-size:12px;color:#9ca3af;margin:2px 0 0">${STATE.editMode?escapeHtml(a.responsable||'Sin asignar'):''}${STATE.editMode && a.fechaLimite?' · ':''}${a.fechaLimite?'vence '+fmtDate(a.fechaLimite):''}</p>` : ''}
         </div>
       </div>`).join('') || '<p style="font-size:13px;color:#6b7280">Sin próximas acciones registradas.</p>';
     body=`
       <div class="exd-card" style="margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px 20px">
+        ${STATE.editMode ? `
         <div><p class="exd-label">Responsable OPIPS</p><p class="exd-value">${escapeHtml(p.info.responsable)}</p></div>
-        <div><p class="exd-label">Financista</p><p class="exd-value">${escapeHtml(p.info.financista)}</p></div>
+        <div><p class="exd-label">Financista</p><p class="exd-value">${escapeHtml(p.info.financista)}</p></div>` : ''}
         <div><p class="exd-label">Unidad Formuladora</p><p class="exd-value">${escapeHtml(p.info.unidadFormuladora)}</p></div>
         <div><p class="exd-label">Unidad Ejecutora</p><p class="exd-value">${escapeHtml(p.info.unidadEjecutora)}</p></div>
       </div>
@@ -743,9 +754,10 @@ function renderDetail(cui){
       </div>
       <div style="background:#f7faf9;border-radius:10px;padding:0.85rem 1.1rem;min-width:190px">
         <p class="exd-label">Monto de inversión (S/)</p>
-        <p style="font-size:17px;font-weight:700;margin:0 0 8px">${fmtMoney(p.info.monto)}</p>
+        <p style="font-size:17px;font-weight:700;margin:0 ${STATE.editMode?'0 8px':'0'}">${fmtMoney(p.info.monto)}</p>
+        ${STATE.editMode ? `
         <p class="exd-label">Financista</p>
-        <p style="font-size:13px;margin:0;font-weight:600">${escapeHtml(p.info.financista)}</p>
+        <p style="font-size:13px;margin:0;font-weight:600">${escapeHtml(p.info.financista)}</p>` : ''}
       </div>
     </div>
     <div class="exd-tabsrow-wrap" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e9e7;margin-bottom:1rem">
