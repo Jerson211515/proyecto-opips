@@ -3,12 +3,12 @@ body { margin: 0; padding: 20px; background: #dfe8e4; font-family: 'Segoe UI', A
 .ti { line-height: 1; }
 
 .exd { font-family: inherit; color: #1f2937; background: #eef3f1; border-radius: 14px; overflow: hidden; border: 1px solid #dde5e2; max-width: 1280px; margin: 0 auto; box-shadow: 0 2px 10px rgba(15,61,46,0.08); }
-.exd-header { background: #0f3d2e; padding: 14px 20px; display: flex; align-items: center; gap: 14px; color: #fff; }
-.exd-logo { width: 38px; height: 38px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 19px; color: #0f3d2e; overflow: hidden; }
+.exd-header { background: #800000; padding: 14px 20px; display: flex; align-items: center; gap: 14px; color: #fff; }
+.exd-logo { width: 38px; height: 38px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 19px; color: #800000; overflow: hidden; }
 .exd-logo img { width: 100%; height: 100%; object-fit: cover; }
 .exd-h-title { font-size: 11px; font-weight: 700; letter-spacing: .03em; opacity: .85; margin: 0; }
 .exd-h-sub { font-size: 15px; font-weight: 600; margin: 2px 0 0; }
-.exd-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1d6b4f; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
+.exd-avatar { width: 32px; height: 32px; border-radius: 50%; background: #800000; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
 .exd-save-indicator { font-size: 12px; color: rgba(255,255,255,0.65); white-space: nowrap; }
 .exd-edit-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3); color: #fff; border-radius: 8px; padding: 7px 13px; font-size: 12.5px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
 .exd-edit-btn:hover { background: rgba(255,255,255,0.2); }
@@ -18,7 +18,7 @@ body { margin: 0; padding: 20px; background: #dfe8e4; font-family: 'Segoe UI', A
 .exd-sidebar { width: 200px; flex-shrink: 0; background: #fff; padding: 16px 12px; border-right: 1px solid #e5e9e7; }
 .exd-nav { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: 8px; font-size: 13.5px; cursor: pointer; color: #4b5563; margin-bottom: 2px; }
 .exd-nav:hover { background: #f4f6f5; }
-.exd-nav.active { background: #e8f2ee; color: #0f3d2e; font-weight: 600; }
+.exd-nav.active { background: #e8f2ee; color: #800000; font-weight: 600; }
 .exd-quick { display: flex; align-items: center; gap: 8px; padding: 7px 10px; font-size: 12.5px; color: #4b5563; border-radius: 8px; cursor: pointer; }
 .exd-quick:hover { background: #f4f6f5; }
 .exd-main { flex: 1; min-width: 0; padding: 20px; background: #eef3f1; }
@@ -29,9 +29,9 @@ body { margin: 0; padding: 20px; background: #dfe8e4; font-family: 'Segoe UI', A
 .exd-value { font-size: 14px; margin: 0 0 8px; color: #1f2937; }
 
 .exd-tab { padding: 9px 4px; font-size: 13.5px; color: #6b7280; cursor: pointer; border-bottom: 2.5px solid transparent; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
-.exd-tab.active { color: #0f3d2e; font-weight: 600; border-bottom-color: #0f3d2e; }
+.exd-tab.active { color: #800000; font-weight: 600; border-bottom-color: #800000; }
 
-.exd-btn { background: #0f3d2e; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; cursor: pointer; font-weight: 500; }
+.exd-btn { background: #800000; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; cursor: pointer; font-weight: 500; }
 .exd-btn:hover { opacity: .92; }
 .exd-btn:disabled { opacity: .5; cursor: not-allowed; }
 .exd-btn-outline { background: #fff; color: #1d4ed8; border: 1.5px solid #bfdbfe; border-radius: 8px; padding: 8px 14px; font-size: 13px; cursor: pointer; font-weight: 600; }
@@ -56,7 +56,7 @@ body { margin: 0; padding: 20px; background: #dfe8e4; font-family: 'Segoe UI', A
 /* ============ TOGGLE TARJETAS / TABLA ============ */
 .exd-view-toggle { display: flex; background: #fff; border: 1px solid #e5e9e7; border-radius: 8px; padding: 3px; gap: 2px; }
 .exd-view-btn { background: transparent; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12.5px; font-weight: 600; color: #6b7280; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-.exd-view-btn.active { background: #0f3d2e; color: #fff; }
+.exd-view-btn.active { background: #800000; color: #fff; }
 
 /* ============ VISTA TABLA DE PROYECTOS ============ */
 .exd-table-wrap { background: #fff; border: 1px solid #e5e9e7; border-radius: 12px; overflow: hidden; }
