@@ -299,7 +299,7 @@ function renderSidebar(){
       </svg>
       <div>${legend}</div>
     </div>
-    <div style="border-top:1px solid #e5e9e7;padding-top:10px;font-size:11px;color:#9ca3af">
+    <div style="border-top:1px solid #e6e1de;padding-top:10px;font-size:11px;color:#9ca3af">
       ${enEjecucion} en ejecución · ${enRiesgo} en riesgo
     </div>
   `;
@@ -328,8 +328,8 @@ function renderDashboard(){
   const etapaBars = etapaCounts.map(({etapa,count})=>{
     const isActive = STATE.dashFilterEtapa===etapa;
     const pct = (count/maxEtapa)*100;
-    const barColor = isActive ? '#800000' : (count>0 ? '#a8c9bd' : '#e5e9e7');
-    return `<div class="exd-barrow" data-etapa="${escapeHtml(etapa)}" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:5px 4px;border-radius:6px;${isActive?'background:#e8f2ee':''}">
+    const barColor = isActive ? '#800000' : (count>0 ? '#c9c0bc' : '#e6e1de');
+    return `<div class="exd-barrow" data-etapa="${escapeHtml(etapa)}" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:5px 4px;border-radius:6px;${isActive?'background:#f6e8e8':''}">
       <span style="font-size:11.5px;color:${isActive?'#800000':'#6b7280'};font-weight:${isActive?'700':'500'};width:150px;flex-shrink:0;line-height:1.25">${escapeHtml(etapaShort(etapa))}</span>
       <div style="flex:1;background:#f3f4f6;border-radius:5px;height:20px;position:relative;overflow:hidden">
         <div class="exd-bar-fill" data-w="${pct}" style="width:0%;background:${barColor};height:100%;border-radius:5px"></div>
@@ -394,7 +394,7 @@ function renderDashboard(){
       <div class="exd-card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <h3 style="margin:0;font-size:13.5px">Inversiones por Etapa</h3>
-          ${STATE.dashFilterEtapa ? `<button id="exd-dash-clear" style="background:transparent;border:none;color:#1d4ed8;font-size:11.5px;font-weight:600;cursor:pointer;padding:0"><i class="ti ti-x"></i> Quitar filtro</button>` : ''}
+          ${STATE.dashFilterEtapa ? `<button id="exd-dash-clear" style="background:transparent;border:none;color:#800000;font-size:11.5px;font-weight:600;cursor:pointer;padding:0"><i class="ti ti-x"></i> Quitar filtro</button>` : ''}
         </div>
         <div>${etapaBars}</div>
       </div>
@@ -578,7 +578,7 @@ function renderTimeline(p){
       <span><i class="ti ti-circle-filled" style="font-size:10px;color:#1d4ed8"></i> En curso</span>
       <span><i class="ti ti-circle-filled" style="font-size:10px;color:#d1d5db"></i> Pendiente</span>
     </div>
-    <div style="margin-top:8px;padding:8px 10px;background:#f7faf9;border-radius:8px;font-size:12px;color:#4b5563;line-height:1.5">
+    <div style="margin-top:8px;padding:8px 10px;background:#f8f6f5;border-radius:8px;font-size:12px;color:#4b5563;line-height:1.5">
       <b style="color:#800000">${escapeHtml(curMeta.fase)} · ${escapeHtml(curMeta.articulo)}</b> — ${escapeHtml(curMeta.plazo)}
       <span style="display:block;font-size:10.5px;color:#9ca3af;margin-top:2px">Reglamento de la Ley N° 29230, D.S. N° 038-2026-EF</span>
     </div>`;
@@ -666,7 +666,7 @@ function renderDetail(cui){
       <div class="exd-card">
         <h3 style="margin:0 0 12px;font-size:15px">Bitácora de seguimiento</h3>
         <div class="exd-loglist">${logItems}</div>
-        <p class="exd-lock-note" style="margin-top:14px"><i class="ti ti-table"></i> La etapa, avances y nuevos registros de seguimiento se actualizan directo en <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" style="color:#1d4ed8;font-weight:600">Google Sheets</a>, no desde aquí.</p>
+        <p class="exd-lock-note" style="margin-top:14px"><i class="ti ti-table"></i> La etapa, avances y nuevos registros de seguimiento se actualizan directo en <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" style="color:#800000;font-weight:600">Google Sheets</a>, no desde aquí.</p>
       </div>
       ${p.info.fechaLimiteInformePrevio ? `
       <div class="exd-card" style="margin-top:14px;border-color:#f0d78c;background:#fffbea">
@@ -703,7 +703,7 @@ function renderDetail(cui){
     }).join('');
     body=`
       ${bloques || '<div class="exd-card"><p style="font-size:13px;color:#6b7280">Sin cronograma de proceso de selección registrado para este proyecto todavía.</p></div>'}
-      <p class="exd-lock-note"><i class="ti ti-table"></i> El cronograma se actualiza directo en <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" style="color:#1d4ed8;font-weight:600">Google Sheets</a>, a partir de las Circulares publicadas en gob.pe.</p>
+      <p class="exd-lock-note"><i class="ti ti-table"></i> El cronograma se actualiza directo en <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" style="color:#800000;font-weight:600">Google Sheets</a>, a partir de las Circulares publicadas en gob.pe.</p>
     `;
   } else if(STATE.activeTab==='responsables'){
     const accionesItems=p.proximasAcciones.map((a)=>`
@@ -725,13 +725,13 @@ function renderDetail(cui){
       <div class="exd-card">
         <h3 style="margin:0 0 12px;font-size:15px">Próximas acciones</h3>
         <div>${accionesItems}</div>
-        <p class="exd-lock-note" style="margin-top:14px"><i class="ti ti-table"></i> Responsables y próximas acciones se actualizan directo en <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" style="color:#1d4ed8;font-weight:600">Google Sheets</a>, no desde aquí.</p>
+        <p class="exd-lock-note" style="margin-top:14px"><i class="ti ti-table"></i> Responsables y próximas acciones se actualizan directo en <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" style="color:#800000;font-weight:600">Google Sheets</a>, no desde aquí.</p>
       </div>
     `;
   }
 
   return `
-    <button id="exd-back" style="background:transparent;border:none;color:#1d4ed8;font-size:13.5px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px">
+    <button id="exd-back" style="background:transparent;border:none;color:#800000;font-size:13.5px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px">
       <i class="ti ti-arrow-left"></i> Volver a la cartera
     </button>
     <div class="exd-card" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px">
@@ -752,7 +752,7 @@ function renderDetail(cui){
           </div>
         </div>
       </div>
-      <div style="background:#f7faf9;border-radius:10px;padding:0.85rem 1.1rem;min-width:190px">
+      <div style="background:#f8f6f5;border-radius:10px;padding:0.85rem 1.1rem;min-width:190px">
         <p class="exd-label">Monto de inversión (S/)</p>
         <p style="font-size:17px;font-weight:700;margin:0 ${STATE.editMode?'0 8px':'0'}">${fmtMoney(p.info.monto)}</p>
         ${STATE.editMode ? `
@@ -760,7 +760,7 @@ function renderDetail(cui){
         <p style="font-size:13px;margin:0;font-weight:600">${escapeHtml(p.info.financista)}</p>` : ''}
       </div>
     </div>
-    <div class="exd-tabsrow-wrap" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e9e7;margin-bottom:1rem">
+    <div class="exd-tabsrow-wrap" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e6e1de;margin-bottom:1rem">
       <div class="exd-tabsrow" style="display:flex;gap:22px">${tabsHtml}</div>
       <div style="display:flex;gap:8px;margin-bottom:8px">
         <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> Editar en Sheets</a>
@@ -790,7 +790,7 @@ function renderDocumentos(cui){
       <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f0f0f0">
         <div><p style="font-size:13.5px;margin:0;font-weight:600">${escapeHtml(d.nombre)}</p><p style="font-size:12px;color:#9ca3af;margin:2px 0 0">${escapeHtml(d.tipo||'Documento')} ${d.fecha?'· '+fmtDate(d.fecha):''}</p></div>
         <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
-          ${d.link?`<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" style="font-size:12.5px;color:#1d4ed8;font-weight:600"><i class="ti ti-external-link"></i> Abrir</a>`:'<span style="font-size:12px;color:#9ca3af">Sin link</span>'}
+          ${d.link?`<a href="${escapeHtml(d.link)}" target="_blank" rel="noopener" style="font-size:12.5px;color:#800000;font-weight:600"><i class="ti ti-external-link"></i> Abrir</a>`:'<span style="font-size:12px;color:#9ca3af">Sin link</span>'}
           ${STATE.editMode ? `
           <button class="exd-doc-edit" data-idx="${d.idx}" title="Editar" style="background:transparent;border:none;cursor:pointer;color:#6b7280;padding:2px;display:flex"><i class="ti ti-pencil" style="font-size:15px"></i></button>
           <button class="exd-doc-del" data-idx="${d.idx}" title="Eliminar" style="background:transparent;border:none;cursor:pointer;color:#c0392b;padding:2px;display:flex"><i class="ti ti-trash" style="font-size:15px"></i></button>
@@ -803,7 +803,7 @@ function renderDocumentos(cui){
   const editingDoc = (editingIdx!=null && p.documentos[editingIdx]) ? p.documentos[editingIdx] : null;
   const faseOptions=ETAPAS.map(e=>`<option value="${escapeHtml(e)}" ${editingDoc&&editingDoc.fase===e?'selected':''}>${escapeHtml(e)}</option>`).join('');
   return `
-    <button id="exd-back-docs" style="background:transparent;border:none;color:#1d4ed8;font-size:13.5px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px">
+    <button id="exd-back-docs" style="background:transparent;border:none;color:#800000;font-size:13.5px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px">
       <i class="ti ti-arrow-left"></i> Volver al expediente
     </button>
     <p style="font-size:12px;color:#9ca3af;margin:0 0 2px">CUI ${p.cui}</p>
