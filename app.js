@@ -57,7 +57,7 @@ let STATE = {
   projects: [], view: 'dashboard', currentCui: null, activeTab: 'resumen',
   search: '', filterEtapa: '', filterRiesgo: false, loaded: false,
   editMode: false, dirty: false, saving: false, saveMsg: '',
-  dashFilterEtapa: '', editingDocIdx: null,
+  dashFilterEtapa: '', editingDocIdx: null, config: {},
   carteraView: localStorage.getItem('exd_cartera_view') || 'tarjetas'
 };
 
@@ -86,17 +86,21 @@ async function fetchGvizSheet(tabName){
 
 async function loadData(){
   try {
-    const [carteraRows, seguimientoRows, accionesRows, cronogramaRows, docRes] = await Promise.all([
+    const [carteraRows, seguimientoRows, accionesRows, cronogramaRows, configRows, docRes] = await Promise.all([
       fetchGvizSheet('Cartera'),
       fetchGvizSheet('Seguimiento'),
       fetchGvizSheet('ProximasAcciones'),
       fetchGvizSheet('CronogramaSeleccion'),
+      fetchGvizSheet('Config'),
       fetch('data.json?t=' + Date.now())
     ]);
     if (!docRes.ok) throw new Error('No se pudo leer data.json (documentos)');
     const docData = await docRes.json();
     const docsByCui = {};
     docData.forEach(d => { docsByCui[Number(d.cui)] = d.documentos || []; });
+
+    STATE.config = {};
+    configRows.forEach(r => { if (r.Parametro) STATE.config[r.Parametro] = r.Valor; });
 
     STATE.projects = carteraRows.filter(r=>r.CUI!=null).map(row=>{
       const cui = Number(row.CUI);
@@ -108,6 +112,7 @@ async function loadData(){
           provincia: row.Provincia || 'Sin registrar',
           distrito: row.Distrito || 'Sin registrar',
           monto: Number(row.Monto) || 0,
+          montoCIPRL: (row.MontoCIPRL !== null && row.MontoCIPRL !== '') ? Number(row.MontoCIPRL) : null,
           financista: row.Financista || 'Sin financista registrado',
           responsable: row.Responsable || 'Sin asignar',
           funcion: row.Funcion || 'Sin función registrada',
@@ -421,6 +426,64 @@ function renderDashboard(){
             <div>${etdeLegend}</div>
           </div>
         </div>
+      </div>
+    </div>
+    ${renderCiprlSection()}
+  `;
+}
+
+// ============ AVANCE DEL TOPE CIPRL ============
+function renderCiprlSection(){
+  const tope = Number(STATE.config['TopeCIPRL']) || 0;
+  if (!tope) return ''; // sin tope configurado, no se muestra nada (evita mostrar 0/0 confuso)
+
+  const conDato = STATE.projects.filter(p => p.info.montoCIPRL !== null);
+  const sinDato = STATE.projects.length - conDato.length;
+  const comprometido = conDato.reduce((a,p)=>a+p.info.montoCIPRL, 0);
+  const disponible = tope - comprometido;
+  const pct = Math.min(100, (comprometido/tope)*100);
+
+  // Desglose por fase (Priorización / Actos Previos / Proceso de Selección / Ejecución)
+  const porFase = {};
+  conDato.forEach(p=>{
+    const fase = groupLabel(p.situacion.etapa);
+    porFase[fase] = (porFase[fase]||0) + p.info.montoCIPRL;
+  });
+  const fasesBars = Object.keys(GROUP_COLORS).map(fase=>{
+    const monto = porFase[fase] || 0;
+    const fpct = tope ? (monto/tope)*100 : 0;
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="color:#4b5563;font-weight:600">${escapeHtml(fase)}</span>
+        <span style="color:#1f2937;font-weight:700">${fmtMoney(monto)} <span style="color:#9ca3af;font-weight:500">(${fpct.toFixed(1)}%)</span></span>
+      </div>
+      <div style="background:#f3f4f6;border-radius:5px;height:14px;overflow:hidden">
+        <div class="exd-bar-fill" data-w="${fpct}" style="width:0%;background:${GROUP_COLORS[fase]};height:100%;border-radius:5px"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="exd-card" style="margin-top:14px;padding:1.5rem">
+      <h3 style="margin:0 0 4px;font-size:17px">Avance del Tope CIPRL</h3>
+      <p style="font-size:12.5px;color:#9ca3af;margin:0 0 18px">Monto comprometido por la cartera de proyectos frente al tope que puede comprometer el Gobierno Regional San Martín</p>
+
+      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <span style="font-size:28px;font-weight:700;color:#800000">${fmtMoney(comprometido)}</span>
+        <span style="font-size:14px;color:#6b7280">comprometido de <b style="color:#1f2937">${fmtMoney(tope)}</b></span>
+      </div>
+      <div style="background:#f3f4f6;border-radius:8px;height:28px;overflow:hidden;position:relative">
+        <div class="exd-bar-fill" data-w="${pct}" style="width:0%;background:#800000;height:100%;border-radius:8px"></div>
+        <span style="position:absolute;top:0;left:12px;height:28px;display:flex;align-items:center;font-size:12.5px;font-weight:700;color:#fff">${pct.toFixed(1)}%</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px">
+        <span style="font-size:12px;color:#9ca3af">Disponible: <b style="color:#1f2937">${fmtMoney(disponible)}</b></span>
+        ${sinDato>0 ? `<span style="font-size:12px;color:#e0a626"><i class="ti ti-alert-triangle"></i> ${sinDato} proyecto${sinDato>1?'s':''} sin monto CIPRL registrado</span>` : ''}
+      </div>
+
+      <div style="border-top:1px solid #f0f0f0;margin-top:18px;padding-top:16px">
+        <h4 style="margin:0 0 12px;font-size:13px;color:#4b5563">Desglose por fase</h4>
+        ${fasesBars}
       </div>
     </div>
   `;
