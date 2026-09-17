@@ -71,7 +71,7 @@ function gvizDateToISO(v){
   return v || '';
 }
 async function fetchGvizSheet(tabName){
-  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tabName)}&t=${Date.now()}`;
+  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tabName)}&headers=1&t=${Date.now()}`;
   const res = await fetch(url);
   const text = await res.text();
   const jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}')+1);
