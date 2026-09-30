@@ -122,7 +122,8 @@ async function loadData(){
           fechaEnvioInformePrevio: gvizDateToISO(row.FechaEnvioInformePrevio),
           fechaLimiteInformePrevio: gvizDateToISO(row.FechaLimiteInformePrevio),
           linkInvestInPeruFinancista: row.LinkInvestInPeruFinancista || '',
-          linkInvestInPeruEPS: row.LinkInvestInPeruEPS || ''
+          linkInvestInPeruEPS: row.LinkInvestInPeruEPS || '',
+          linkDrive: row.LinkDrive || ''
         },
         situacion: {
           estado: row.Estado || 'Sin dato',
@@ -827,7 +828,7 @@ function renderDetail(cui){
       <div class="exd-tabsrow" style="display:flex;gap:22px">${tabsHtml}</div>
       <div style="display:flex;gap:8px;margin-bottom:8px">
         <a href="${CONFIG.sheetUrl}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> Editar en Sheets</a>
-        <button id="exd-go-docs" class="exd-btn-outline"><i class="ti ti-folder"></i> Documentos</button>
+        ${STATE.editMode ? `<button id="exd-go-docs" class="exd-btn-outline"><i class="ti ti-folder"></i> Documentos</button>` : ''}
       </div>
     </div>
     ${body}
@@ -836,7 +837,15 @@ function renderDetail(cui){
 
 function wireDetail(){
   document.getElementById('exd-back').addEventListener('click',()=>{STATE.view='cartera';render();});
-  document.getElementById('exd-go-docs').addEventListener('click',()=>{STATE.view='documentos';render();});
+  const docsBtn=document.getElementById('exd-go-docs');
+  if(docsBtn) docsBtn.addEventListener('click',()=>{
+    const link=(getProject(STATE.currentCui).info.linkDrive||'').trim();
+    if(!/^https?:\/\//i.test(link)){
+      alert('Este proyecto no tiene carpeta de Drive asignada.\nAgrega el link en la columna LinkDrive de la hoja Cartera.');
+      return;
+    }
+    window.open(link,'_blank','noopener');
+  });
   document.querySelectorAll('.exd-tab').forEach(t=>t.addEventListener('click',()=>{STATE.activeTab=t.dataset.tab;render();}));
 }
 
