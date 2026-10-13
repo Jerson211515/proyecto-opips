@@ -434,58 +434,96 @@ function renderDashboard(){
 }
 
 // ============ AVANCE DEL TOPE CIPRL ============
+// Tarjetas Tope / Inversión en marcha, barra de avance sobre el tope y desglose por fase.
+// Inversión en marcha = Proceso de Selección + Ejecución.
+const CIPRL_FASE_COLORS = {'Priorización':'#c0392b','Actos Previos':'#b7860b','Proceso de Selección':'#1f7a8c','Ejecución':'#2e7d32'};
+const CIPRL_FASES_EN_MARCHA = ['Proceso de Selección','Ejecución'];
+function fmtMillones(n){ return 'S/ ' + (Number(n||0)/1e6).toLocaleString('es-PE',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' M'; }
+
 function renderCiprlSection(){
   const tope = Number(STATE.config['TopeCIPRL']) || 0;
-  if (!tope) return ''; // sin tope configurado, no se muestra nada (evita mostrar 0/0 confuso)
+  if (!tope) return ''; // sin tope configurado, no se muestra nada
 
   const conDato = STATE.projects.filter(p => p.info.montoCIPRL !== null);
   const sinDato = STATE.projects.length - conDato.length;
-  const comprometido = conDato.reduce((a,p)=>a+p.info.montoCIPRL, 0);
-  const disponible = tope - comprometido;
-  const pct = Math.min(100, (comprometido/tope)*100);
 
-  // Desglose por fase (Priorización / Actos Previos / Proceso de Selección / Ejecución)
-  const porFase = {};
+  // Monto y cantidad de proyectos por fase
+  const porFase = {}, nFase = {};
   conDato.forEach(p=>{
     const fase = groupLabel(p.situacion.etapa);
     porFase[fase] = (porFase[fase]||0) + p.info.montoCIPRL;
+    nFase[fase] = (nFase[fase]||0) + 1;
   });
-  const fasesBars = Object.keys(GROUP_COLORS).map(fase=>{
-    const monto = porFase[fase] || 0;
-    const fpct = tope ? (monto/tope)*100 : 0;
-    return `<div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-        <span style="color:#4b5563;font-weight:600">${escapeHtml(fase)}</span>
-        <span style="color:#1f2937;font-weight:700">${fmtMoney(monto)} <span style="color:#9ca3af;font-weight:500">(${fpct.toFixed(1)}%)</span></span>
-      </div>
-      <div style="background:#f3f4f6;border-radius:5px;height:14px;overflow:hidden">
-        <div class="exd-bar-fill" data-w="${fpct}" style="width:0%;background:${GROUP_COLORS[fase]};height:100%;border-radius:5px"></div>
+  const totalCartera = Object.values(porFase).reduce((a,b)=>a+b,0);
+  const enMarcha = CIPRL_FASES_EN_MARCHA.reduce((a,f)=>a+(porFase[f]||0),0);
+  const nEnMarcha = CIPRL_FASES_EN_MARCHA.reduce((a,f)=>a+(nFase[f]||0),0);
+  const pctTope = Math.min(100, (enMarcha/tope)*100);
+
+  // Solo fases con monto (se ocultan las que están en cero)
+  const fases = Object.keys(GROUP_COLORS).filter(f => (porFase[f]||0) > 0);
+  const maxFase = Math.max(...fases.map(f=>porFase[f]), 1);
+
+  const titulo = (icon, text, extra='') => `<p style="margin:0 0 10px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#7f1d1d;display:flex;align-items:center;gap:6px"><i class="ti ${icon}" aria-hidden="true"></i>${text}${extra}</p>`;
+
+  // Barras de monto por fase
+  const barras = fases.map(f=>{
+    const w = (porFase[f]/maxFase)*100;
+    const dentro = w >= 45; // si la barra es corta, el monto va afuera
+    const etiqueta = `<span style="font-size:12px;font-weight:700;white-space:nowrap;${dentro?'position:absolute;right:8px;top:0;height:100%;display:flex;align-items:center;color:#fff':'margin-left:8px;color:#1f2937'}">${fmtMillones(porFase[f])}</span>`;
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span style="flex:0 1 150px;min-width:84px;text-align:right;font-size:13px;font-weight:600;color:#374151;line-height:1.2">${escapeHtml(f)}</span>
+      <div style="flex:1;display:flex;align-items:center;min-width:0">
+        <div class="exd-bar-fill" data-w="${w}" style="width:0%;height:26px;border-radius:3px;background:${CIPRL_FASE_COLORS[f]};position:relative">${dentro?etiqueta:''}</div>
+        ${dentro?'':etiqueta}
       </div>
     </div>`;
   }).join('');
 
+  // Tarjetas de porcentaje de la cartera por fase
+  const tarjetas = fases.map(f=>{
+    const pct = totalCartera ? (porFase[f]/totalCartera)*100 : 0;
+    return `<div style="background:${CIPRL_FASE_COLORS[f]};color:#fff;border-radius:6px;padding:12px 14px;min-height:92px;display:flex;flex-direction:column;justify-content:space-between">
+      <span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;opacity:.95">${escapeHtml(f)}</span>
+      <span style="font-size:26px;font-weight:700;line-height:1.1">${pct.toLocaleString('es-PE',{minimumFractionDigits:1,maximumFractionDigits:1})}%</span>
+      <span style="font-size:11.5px;opacity:.9">${nFase[f]} proyecto${nFase[f]!==1?'s':''}</span>
+    </div>`;
+  }).join('');
+
   return `
-    <div class="exd-card" style="margin-top:14px;padding:1.5rem">
-      <h3 style="margin:0 0 4px;font-size:17px">Avance del Tope CIPRL</h3>
-      <p style="font-size:12.5px;color:#9ca3af;margin:0 0 18px">Monto comprometido por la cartera de proyectos frente al tope que puede comprometer el Gobierno Regional San Martín</p>
+    <div style="margin-top:14px;display:flex;flex-direction:column;gap:14px">
 
-      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-        <span style="font-size:28px;font-weight:700;color:#800000">${fmtMoney(comprometido)}</span>
-        <span style="font-size:14px;color:#6b7280">comprometido de <b style="color:#1f2937">${fmtMoney(tope)}</b></span>
-      </div>
-      <div style="background:#f3f4f6;border-radius:8px;height:28px;overflow:hidden;position:relative">
-        <div class="exd-bar-fill" data-w="${pct}" style="width:0%;background:#800000;height:100%;border-radius:8px"></div>
-        <span style="position:absolute;top:0;left:12px;height:28px;display:flex;align-items:center;font-size:12.5px;font-weight:700;color:#fff">${pct.toFixed(1)}%</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-top:8px">
-        <span style="font-size:12px;color:#9ca3af">Disponible: <b style="color:#1f2937">${fmtMoney(disponible)}</b></span>
-        ${sinDato>0 ? `<span style="font-size:12px;color:#e0a626"><i class="ti ti-alert-triangle"></i> ${sinDato} proyecto${sinDato>1?'s':''} sin monto CIPRL registrado</span>` : ''}
+      <div style="display:flex;flex-wrap:wrap;gap:14px">
+        <div class="exd-card" style="flex:1 1 280px;padding:1.1rem 1.4rem;margin:0">
+          ${titulo('ti-building-bank','Tope CIPRL')}
+          <p style="margin:0;font-size:30px;font-weight:700;color:#1f2937;line-height:1.1">${fmtMoney(tope)}</p>
+          <p style="margin:6px 0 0;font-size:12.5px;color:#6b7280">Límite que puede comprometer el Gobierno Regional San Martín</p>
+        </div>
+        <div style="flex:1 1 280px;padding:1.1rem 1.4rem;border-radius:12px;background:#2e7d32;color:#fff">
+          <p style="margin:0 0 10px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:6px"><i class="ti ti-trending-up" aria-hidden="true"></i>Inversión en marcha</p>
+          <p style="margin:0;font-size:30px;font-weight:700;line-height:1.1">${fmtMoney(enMarcha)}</p>
+          <p style="margin:6px 0 0;font-size:12.5px;opacity:.9">${nEnMarcha} proyecto${nEnMarcha!==1?'s':''} en proceso de selección o en ejecución</p>
+        </div>
       </div>
 
-      <div style="border-top:1px solid #f0f0f0;margin-top:18px;padding-top:16px">
-        <h4 style="margin:0 0 12px;font-size:13px;color:#4b5563">Desglose por fase</h4>
-        ${fasesBars}
+      <div class="exd-card" style="padding:1.1rem 1.4rem;margin:0">
+        ${titulo('ti-flag-3','Avance sobre el tope CIPRL',` <span style="font-size:14px;color:#2e7d32;letter-spacing:0;margin-left:6px">${pctTope.toLocaleString('es-PE',{minimumFractionDigits:1,maximumFractionDigits:1})}%</span>`)}
+        <div style="background:#e5e7eb;height:26px;border-radius:3px;overflow:hidden">
+          <div class="exd-bar-fill" data-w="${pctTope}" style="width:0%;height:100%;background:#2e7d32"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:8px;flex-wrap:wrap">
+          ${sinDato>0 ? `<span style="font-size:12px;color:#b7860b"><i class="ti ti-alert-triangle" aria-hidden="true"></i> ${sinDato} proyecto${sinDato>1?'s':''} sin monto CIPRL registrado</span>` : '<span></span>'}
+          <span style="font-size:11.5px;font-weight:700;color:#374151">Tope CIPRL 100%</span>
+        </div>
       </div>
+
+      <div class="exd-card" style="padding:1.1rem 1.4rem;margin:0">
+        ${titulo('ti-chart-bar','Desglose por fase OxI',' <span style="text-transform:none;letter-spacing:0;font-weight:600;color:#7f1d1d;margin-left:4px">· monto CIPRL y % de la cartera</span>')}
+        <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin-top:6px">
+          <div style="flex:1 1 380px;min-width:0">${barras}</div>
+          <div style="flex:1 1 300px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">${tarjetas}</div>
+        </div>
+      </div>
+
     </div>
   `;
 }
