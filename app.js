@@ -15,7 +15,7 @@ const CONFIG = {
 
 // ============ ETAPAS Y COLORES ============
 const ETAPAS = [
-  "0. En trámite de priorización","1. Inversión priorizada con acuerdo de consejo","2. Solicitud de informe Previo a CGR",
+  "0. En trámite de priorización","1. Inversión Priorizada Con Acuerdo De Consejo","2. Solicitud de informe Previo a CGR",
   "3. Informe Previo emitido","4. Aprobación de bases","5. Convocatoria","6. Buena Pro","7. Elaboración de ET","8. Ejecución Física"
 ];
 
@@ -32,12 +32,27 @@ const ETAPA_META = [
   { fase:'Ejecución', articulo:'Art. 139.1', plazo:'Las valorizaciones se presentan dentro de los primeros 3 días del mes siguiente a cada avance.' }
 ];
 
-function etapaIndex(e){ const i = ETAPAS.findIndex(x=>x===e); return i===-1?0:i; }
+// Normaliza un texto: sin tildes, en minúsculas y sin espacios sobrantes
+function normEtapa(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
+// "Sin etapa" (opción de la hoja) no corresponde a ninguna de las 9 etapas
+function esSinEtapa(e){ return !e || normEtapa(e) === 'sin etapa'; }
+// Identifica la etapa por el NÚMERO inicial ("1. ..."), así un cambio de texto en Sheets no rompe la app.
+// Si no hay número, compara el texto ignorando mayúsculas y tildes.
+function etapaIndex(e){
+  const m = String(e||'').match(/^\s*(\d+)/);
+  if (m){ const n = Number(m[1]); if (n >= 0 && n < ETAPAS.length) return n; }
+  const i = ETAPAS.findIndex(x => normEtapa(x) === normEtapa(e));
+  return i === -1 ? 0 : i;
+}
+// ¿Dos textos de etapa son la misma etapa?
+function mismaEtapa(a,b){ return !esSinEtapa(a) && !esSinEtapa(b) && etapaIndex(a) === etapaIndex(b); }
 function etapaShort(e){ return e.replace(/^\d+\.\s*/,''); }
 function etapaMeta(e){ return ETAPA_META[etapaIndex(e)]; }
 function etapaColor(e){
+  if (esSinEtapa(e)) return {bg:'#f3f4f6',text:'#6b7280'};   // Sin etapa: gris
   const i = etapaIndex(e);
-  if (i<=1) return {bg:'#fdeceb',text:'#c0392b'};
+  if (i===0) return {bg:'#fdeceb',text:'#c0392b'};           // 0: rojo
+  if (i===1) return {bg:'#f1ecfd',text:'#7c3aed'};           // 1: morado suave
   if (i<=4) return {bg:'#fdf3e2',text:'#b8860b'};
   if (i<=6) return {bg:'#e7f0fd',text:'#1d4ed8'};
   return {bg:'#e6f6ee',text:'#0f9d58'};
@@ -315,7 +330,7 @@ function wireSidebar(){
   const ej=document.querySelector('[data-nav="ejecucion"]'), rg=document.querySelector('[data-nav="riesgo"]');
   if(d) d.addEventListener('click',()=>{STATE.view='dashboard';STATE.dashFilterEtapa='';render();});
   if(c) c.addEventListener('click',()=>{STATE.view='cartera';STATE.filterEtapa='';STATE.filterRiesgo=false;render();});
-  if(ej) ej.addEventListener('click',()=>{STATE.view='cartera';STATE.filterEtapa='8. Ejecución Física';STATE.filterRiesgo=false;render();});
+  if(ej) ej.addEventListener('click',()=>{STATE.view='cartera';STATE.filterEtapa=ETAPAS[8];STATE.filterRiesgo=false;render();});
   if(rg) rg.addEventListener('click',()=>{STATE.view='cartera';STATE.filterEtapa='';STATE.filterRiesgo=true;render();});
 }
 
@@ -327,9 +342,9 @@ function renderDashboard(){
   const enConvocatoria=STATE.projects.filter(p=>etapaIndex(p.situacion.etapa)===5).length;
 
   // El gráfico de Etapa siempre muestra el total (es el disparador del filtro). Se ocultan las etapas sin proyectos.
-  const filtered = STATE.dashFilterEtapa ? STATE.projects.filter(p=>p.situacion.etapa===STATE.dashFilterEtapa) : STATE.projects;
+  const filtered = STATE.dashFilterEtapa ? STATE.projects.filter(p=>mismaEtapa(p.situacion.etapa, STATE.dashFilterEtapa)) : STATE.projects;
 
-  const etapaCounts = ETAPAS.map(e=>({ etapa:e, count: STATE.projects.filter(p=>p.situacion.etapa===e).length })).filter(x=>x.count>0);
+  const etapaCounts = ETAPAS.map(e=>({ etapa:e, count: STATE.projects.filter(p=>mismaEtapa(p.situacion.etapa, e)).length })).filter(x=>x.count>0);
   const maxEtapa = Math.max(1, ...etapaCounts.map(x=>x.count));
   const etapaBars = etapaCounts.map(({etapa,count})=>{
     const isActive = STATE.dashFilterEtapa===etapa;
@@ -549,7 +564,7 @@ function wireDashboard(){
 function renderCartera(){
   let filtered=STATE.projects.filter(p=>{
     const ms=!STATE.search||(p.info.nombre+p.cui).toLowerCase().includes(STATE.search.toLowerCase());
-    const me=!STATE.filterEtapa||p.situacion.etapa===STATE.filterEtapa;
+    const me=!STATE.filterEtapa||mismaEtapa(p.situacion.etapa, STATE.filterEtapa);
     const mr=!STATE.filterRiesgo||etapaIndex(p.situacion.etapa)<=1;
     return ms&&me&&mr;
   });
