@@ -138,7 +138,9 @@ async function loadData(){
           fechaLimiteInformePrevio: gvizDateToISO(row.FechaLimiteInformePrevio),
           linkInvestInPeruFinancista: row.LinkInvestInPeruFinancista || '',
           linkInvestInPeruEPS: row.LinkInvestInPeruEPS || '',
-          linkDrive: row.LinkDrive || ''
+          linkDrive: row.LinkDrive || '',
+          linkSobresEF: row.LinkSobresEF || '',
+          linkSobresEPS: row.LinkSobresEPS || ''
         },
         situacion: {
           estado: row.Estado || 'Sin dato',
@@ -772,13 +774,22 @@ function renderDetail(cui){
         <div><p class="exd-label">Avance físico</p><p class="exd-value" style="font-weight:700;font-size:16px">${p.situacion.avanceFisico}%</p></div>
         <div><p class="exd-label">Avance financiero</p><p class="exd-value" style="font-weight:700;font-size:16px">${p.situacion.avanceFinanciero}%</p></div>
       </div>
-      ${(p.info.linkInvestInPeruFinancista || p.info.linkInvestInPeruEPS) ? `
+      ${(p.info.linkInvestInPeruFinancista || p.info.linkInvestInPeruEPS || (STATE.editMode && (p.info.linkSobresEF || p.info.linkSobresEPS))) ? `
       <div class="exd-card" style="margin-bottom:14px">
-        <p class="exd-label" style="margin-bottom:10px">Fuentes oficiales del proceso de selección</p>
+        ${(p.info.linkInvestInPeruFinancista || p.info.linkInvestInPeruEPS) ? `
+        <p class="exd-label" style="margin-bottom:10px">Bases, circulares y actas</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           ${p.info.linkInvestInPeruFinancista ? `<a href="${escapeHtml(p.info.linkInvestInPeruFinancista)}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> InvestInPerú — Financista</a>` : ''}
           ${p.info.linkInvestInPeruEPS ? `<a href="${escapeHtml(p.info.linkInvestInPeruEPS)}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> InvestInPerú — EPS</a>` : ''}
-        </div>
+        </div>` : ''}
+        ${(STATE.editMode && (p.info.linkSobresEF || p.info.linkSobresEPS)) ? `
+        <div style="${(p.info.linkInvestInPeruFinancista || p.info.linkInvestInPeruEPS) ? 'border-top:1px dashed #ddb8b8;margin-top:14px;padding-top:12px' : ''}">
+          <p class="exd-label" style="margin-bottom:10px"><i class="ti ti-lock-open" style="color:#e0a626"></i> Sobres de los postores · solo modo edición</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            ${p.info.linkSobresEF ? `<a href="${escapeHtml(p.info.linkSobresEF)}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-brand-google-drive"></i> Sobres — Financista</a>` : ''}
+            ${p.info.linkSobresEPS ? `<a href="${escapeHtml(p.info.linkSobresEPS)}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-brand-google-drive"></i> Sobres — EPS</a>` : ''}
+          </div>
+        </div>` : ''}
       </div>` : ''}
       <div class="exd-card">
         <h3 style="margin:0 0 12px;font-size:15px">Bitácora de seguimiento</h3>
