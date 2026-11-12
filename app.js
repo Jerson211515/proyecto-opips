@@ -140,7 +140,9 @@ async function loadData(){
           linkInvestInPeruEPS: row.LinkInvestInPeruEPS || '',
           linkDrive: row.LinkDrive || '',
           linkSobresEF: row.LinkSobresEF || '',
-          linkSobresEPS: row.LinkSobresEPS || ''
+          linkSobresEPS: row.LinkSobresEPS || '',
+          numProcesoEF: row.NumProcesoEF || '',
+          numProcesoEPS: row.NumProcesoEPS || ''
         },
         situacion: {
           estado: row.Estado || 'Sin dato',
@@ -703,6 +705,35 @@ function renderTimeline(p){
     </div>`;
 }
 
+// ============ PROCESOS DE SELECCIÓN (pestaña Seguimiento) ============
+// Una fila por proceso (EF / EPS). "Bases y actas" es público; "Sobres" solo en modo edición.
+function renderProcesosSeleccion(p){
+  const procesos = [
+    { icon:'ti-building-bank', tipo:'Empresa financista',          num:p.info.numProcesoEF,  invest:p.info.linkInvestInPeruFinancista, sobres:p.info.linkSobresEF },
+    { icon:'ti-shield-check',  tipo:'Entidad privada supervisora', num:p.info.numProcesoEPS, invest:p.info.linkInvestInPeruEPS,        sobres:p.info.linkSobresEPS }
+  ].filter(x => x.num || x.invest || (STATE.editMode && x.sobres));
+  if (!procesos.length) return '';
+  const pill = 'text-decoration:none;display:inline-flex;align-items:center;gap:5px;padding:6px 11px;font-size:12.5px';
+  const filas = procesos.map((x,i)=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;flex-wrap:wrap;${i>0?'border-top:1px solid #f0ebe9':''}">
+      <div style="width:34px;height:34px;border-radius:50%;background:#f6e8e8;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="ti ${x.icon}" style="font-size:17px;color:#800000"></i>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <p style="font-size:13.5px;font-weight:600;color:#800000;margin:0">${escapeHtml(x.num || x.tipo)}</p>
+        ${x.num ? `<p style="font-size:11.5px;color:#9ca3af;margin:2px 0 0">${x.tipo}</p>` : ''}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
+        ${x.invest ? `<a href="${escapeHtml(x.invest)}" target="_blank" rel="noopener" class="exd-btn-outline" style="${pill}" title="Abrir en InvestInPerú"><i class="ti ti-external-link"></i> Bases y actas</a>` : ''}
+        ${(STATE.editMode && x.sobres) ? `<a href="${escapeHtml(x.sobres)}" target="_blank" rel="noopener" class="exd-btn-outline" style="${pill};border-color:#f0d78c;color:#b8860b;background:#fffbea" title="Abrir carpeta en Google Drive"><i class="ti ti-brand-google-drive"></i> Sobres</a>` : ''}
+      </div>
+    </div>`).join('');
+  return `<div class="exd-card" style="margin-bottom:14px">
+      <p class="exd-label" style="margin-bottom:4px">Procesos de selección</p>
+      ${filas}
+    </div>`;
+}
+
 // ============ DETALLE DE PROYECTO ============
 function renderDetail(cui){
   const p=getProject(cui);
@@ -766,31 +797,7 @@ function renderDetail(cui){
       ${STATE.editMode?`<p style="font-size:12px;color:#9ca3af;margin:0">Responsable: ${escapeHtml(l.responsable||'—')}</p>`:''}
     </div>`).join('') || '<p style="font-size:13px;color:#6b7280">Sin registros de seguimiento aún.</p>';
     body=`
-      <div class="exd-card" style="margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
-        <div>
-          <p class="exd-label">Etapa</p>
-          <span class="exd-badge" style="background:${col.bg};color:${col.text}">${escapeHtml(p.situacion.etapa)}</span>
-        </div>
-        <div><p class="exd-label">Avance físico</p><p class="exd-value" style="font-weight:700;font-size:16px">${p.situacion.avanceFisico}%</p></div>
-        <div><p class="exd-label">Avance financiero</p><p class="exd-value" style="font-weight:700;font-size:16px">${p.situacion.avanceFinanciero}%</p></div>
-      </div>
-      ${(p.info.linkInvestInPeruFinancista || p.info.linkInvestInPeruEPS || (STATE.editMode && (p.info.linkSobresEF || p.info.linkSobresEPS))) ? `
-      <div class="exd-card" style="margin-bottom:14px">
-        ${(p.info.linkInvestInPeruFinancista || p.info.linkInvestInPeruEPS) ? `
-        <p class="exd-label" style="margin-bottom:10px">Bases, circulares y actas</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          ${p.info.linkInvestInPeruFinancista ? `<a href="${escapeHtml(p.info.linkInvestInPeruFinancista)}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> InvestInPerú — Financista</a>` : ''}
-          ${p.info.linkInvestInPeruEPS ? `<a href="${escapeHtml(p.info.linkInvestInPeruEPS)}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-external-link"></i> InvestInPerú — EPS</a>` : ''}
-        </div>` : ''}
-        ${(STATE.editMode && (p.info.linkSobresEF || p.info.linkSobresEPS)) ? `
-        <div style="${(p.info.linkInvestInPeruFinancista || p.info.linkInvestInPeruEPS) ? 'border-top:1px dashed #ddb8b8;margin-top:14px;padding-top:12px' : ''}">
-          <p class="exd-label" style="margin-bottom:10px"><i class="ti ti-lock-open" style="color:#e0a626"></i> Sobres de los postores · solo modo edición</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            ${p.info.linkSobresEF ? `<a href="${escapeHtml(p.info.linkSobresEF)}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-brand-google-drive"></i> Sobres — Financista</a>` : ''}
-            ${p.info.linkSobresEPS ? `<a href="${escapeHtml(p.info.linkSobresEPS)}" target="_blank" rel="noopener" class="exd-btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-brand-google-drive"></i> Sobres — EPS</a>` : ''}
-          </div>
-        </div>` : ''}
-      </div>` : ''}
+      ${renderProcesosSeleccion(p)}
       <div class="exd-card">
         <h3 style="margin:0 0 12px;font-size:15px">Bitácora de seguimiento</h3>
         <div class="exd-loglist">${logItems}</div>
